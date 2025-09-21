@@ -1,4 +1,4 @@
-# MYGLIBC
+# MYLIBC
 
 > I started as me implementing syscalls in assembly
 >
