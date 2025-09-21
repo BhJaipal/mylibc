@@ -29,3 +29,9 @@ size_t syscall(size_t rax, int nargs, size_t *args) {
 	asm("mov %%rax, %0\n":"=r"(out));
 	return out;
 }
+int poll(struct pollfd *ufds, uint64 __nfds, int __timeout) {
+	return SYSCALL(7, 3, (size_t)ufds, __nfds, __timeout);
+}
+int lseek(uint64 fd, int64 offset, uint32 whence) {
+	return SYSCALL(8, 3, fd, offset, whence);
+}
