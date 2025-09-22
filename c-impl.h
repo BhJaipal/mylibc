@@ -4,9 +4,9 @@
 #include "types.h"
 
 extern int rev_d(int x);
-extern char* i32to_str(int32 x);
+extern char* i64to_str(int64 x, uint8 size, char *out);
 extern uint32 rev_u(uint32 x);
-extern char* u32to_str(uint32 x);
+extern char* u64to_str(uint64 x, uint8 size, char *out);
 
 /* C implementation */
 extern void putchar(char c);

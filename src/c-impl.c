@@ -1,7 +1,6 @@
 #include "c-impl.h"
 #include "file.h"
 #include "types.h"
-#include "malloc.h"
 #include "syscall.h"
 #include "string.h"
 
@@ -30,14 +29,12 @@ void write_uint(uint32 x) {
 		x /= 10;
 	}
 }
-char* u32to_str(uint32 x) {
-	x = rev_u(x);
-
-	char *out = malloc(13);
+char* u64to_str(uint64 x, uint8 size, char *out) {
 	size_t out_len = 0;
 	if (x < 10) {
 		out[0] = x + 0x30;
 		out[1] = 0;
+		out_len++;
 		return out;
 	}
 	while (x) {
@@ -46,6 +43,12 @@ char* u32to_str(uint32 x) {
 		out_len++;
 	}
 	out[out_len] = 0;
+	
+	for (size_t i = 0; i < out_len / 2; i++) {
+		out[i] ^= out[out_len - i -1];
+		out[out_len - i - 1] ^= out[i];
+		out[i] ^= out[out_len - i -1];
+	}
 	return out;
 }
 
@@ -85,24 +88,35 @@ void write_int(int x) {
 		x /= 10;
 	}
 }
-char* i32to_str(int x) {
-	x = rev_d(x);
-
-	char *out = malloc(13);
+char* i64to_str(int64 x, uint8 size, char *out) {
 	size_t out_len = 0;
+	char is_neg;
 	if (x < 0) {
 		*out = '-';
 		x = -x;
+		is_neg = 1;
 		out_len++;
 	}
 	if (x < 10) {
 		out[out_len] = x + 0x30;
+		out[out_len + 1] = 0;
+		out_len++;
 		return out;
 	}
 	while (x) {
 		out[out_len] = (x % 10 + 0x30);
 		x /= 10;
 		out_len++;
+	}
+	out[out_len] = 0;
+
+	char *str_start = out + 1;
+	size_t s_len = strlen(str_start);
+	
+	for (size_t i = 0; i < s_len / 2; i++) {
+		str_start[i] ^= str_start[s_len - i -1];
+		str_start[s_len - i - 1] ^= str_start[i];
+		str_start[i] ^= str_start[s_len - i -1];
 	}
 	return out;
 }

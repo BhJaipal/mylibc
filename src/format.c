@@ -22,11 +22,8 @@ size_t get_value(int loc) {
 	}
 	return out;
 }
-
-char* format(const char *str, ...) {
-	asm("pop %rax");
+extern char* format_args(const char *str, size_t *args) {
 	size_t loc = 0;
-	size_t args[] = {get_value(2), get_value(3), get_value(4), get_value(5), get_value(6)};
 	size_t str_len = strlen(str);
 	char mod = 0;
 	size_t dest_len = 0;
@@ -61,39 +58,37 @@ char* format(const char *str, ...) {
 				long_t = 1;
 				continue;
 			} else if (str[i] == 'i') {
-				char *st;
+				char st[24];
 				if (short_t == 2) {
-					st = i32to_str((int8)args[loc]);
+					i64to_str((int8)args[loc], 5, st);
 					short_t = 0;
 				} else if (short_t == 1) {
-					st = i32to_str((int16)args[loc]);
+					i64to_str((int16)args[loc], 7, st);
 					short_t = 0;
 				} else if (long_t) {
-					st = i32to_str((int64)args[loc]);
+					i64to_str((int64)args[loc], 22, st);
 					long_t = 0;
 				} else {
-					st = i32to_str((int64)args[loc]);
+					i64to_str((int32)args[loc], 13, st);
 				}
 				strcat(dest, st);
 				dest_len += strlen(st);
-				free(st);
 			} else if (str[i] == 'u') {
-				char *st;
+				char st[22];
 				if (short_t == 2) {
-					st = u32to_str((uint8)args[loc]);
+					u64to_str((uint8)args[loc], 4, st);
 					short_t = 0;
 				} else if (short_t == 1) {
-					st = u32to_str((uint16)args[loc]);
+					u64to_str((uint16)args[loc], 6, st);
 					short_t = 0;
 				} else if (long_t) {
-					st = u32to_str((uint64)args[loc]);
+					u64to_str((uint64)args[loc], 22, st);
 					long_t = 0;
 				} else {
-					st = u32to_str((uint64)args[loc]);
+					u64to_str((uint32)args[loc], 13, st);
 				}
 				dest_len += strlen(st);
 				strcat(dest, st);
-				free(st);
 			}
 			loc++;
 			mod = 0;
@@ -108,9 +103,14 @@ char* format(const char *str, ...) {
 	}
 	return dest;
 }
-char* formatn(const char *str, uint64 n, ...) {
+
+char* format(const char *str, ...) {
+	size_t args[] = {get_value(2), get_value(3), get_value(4), get_value(5), get_value(6)};
+	return format_args(str, args);
+}
+
+char* formatn_args(const char *str, size_t n, size_t *args) {
 	size_t loc = 0;
-	size_t args[] = {get_value(3), get_value(4), get_value(5), get_value(6)};
 	size_t str_len = strlen(str);
 	char mod = 0;
 	size_t dest_len = 0;
@@ -121,7 +121,7 @@ char* formatn(const char *str, uint64 n, ...) {
 	char *dest = malloc(n);
 
 	for (size_t i = 0; i < str_len; i++) {
-		if (n == dest_len) {
+		if (n <= dest_len) {
 			break;
 		}
 		if (mod) {
@@ -144,39 +144,37 @@ char* formatn(const char *str, uint64 n, ...) {
 				long_t = 1;
 				continue;
 			} else if (str[i] == 'i') {
-				char *st;
+				char st[22];
 				if (short_t == 2) {
-					st = i32to_str((int8)args[loc]);
+					i64to_str((int8)args[loc], 5, st);
 					short_t = 0;
 				} else if (short_t == 1) {
-					st = i32to_str((int16)args[loc]);
+					i64to_str((int16)args[loc], 7, st);
 					short_t = 0;
 				} else if (long_t) {
-					st = i32to_str((int64)args[loc]);
+					i64to_str((int64)args[loc], 22, st);
 					long_t = 0;
 				} else {
-					st = i32to_str((int64)args[loc]);
+					i64to_str((int32)args[loc], 13, st);
 				}
 				strcat(dest, st);
 				dest_len += strlen(st);
-				free(st);
 			} else if (str[i] == 'u') {
-				char *st;
+				char st[22];
 				if (short_t == 2) {
-					st = u32to_str((uint8)args[loc]);
+					u64to_str((uint8)args[loc], 4, st);
 					short_t = 0;
 				} else if (short_t == 1) {
-					st = u32to_str((uint16)args[loc]);
+					u64to_str((uint16)args[loc], 6, st);
 					short_t = 0;
 				} else if (long_t) {
-					st = u32to_str((uint64)args[loc]);
+					u64to_str((uint64)args[loc], 22, st);
 					long_t = 0;
 				} else {
-					st = u32to_str((uint64)args[loc]);
+					u64to_str((uint32)args[loc], 13, st);
 				}
 				dest_len += strlen(st);
 				strcat(dest, st);
-				free(st);
 			}
 			loc++;
 			mod = 0;
@@ -190,4 +188,8 @@ char* formatn(const char *str, uint64 n, ...) {
 		}
 	}
 	return dest;
+}
+char* formatn(const char *str, uint64 n, ...) {
+	size_t args[] = {get_value(3), get_value(4), get_value(5), get_value(6)};
+	return formatn_args(str, n, args);
 }

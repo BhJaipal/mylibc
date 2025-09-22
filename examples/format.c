@@ -1,5 +1,4 @@
 #include "format.h"
-#include "malloc.h"
 #include "c-impl.h"
 
 int main() {

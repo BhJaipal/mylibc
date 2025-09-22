@@ -1,13 +1,12 @@
 #include "c-impl.h"
+#include "file.h"
 
 int main(int argc, char **argv) {
-	print("[");
+	printf("[");
 	for (int  i = 0; i < argc; i++) {
-		print("'");
-		print(argv[i]);
-		print("'");
+		printf("'%s'", argv[i]);
 		if (i != argc-1) {
-			print(", ");
+			printf(", ");
 		}
 	}
 	println("]");
@@ -24,6 +23,5 @@ int main(int argc, char **argv) {
 		if (b > c) g = b;
 		else g = c;
 	}
-	write_int(g);
-	println(" is greatest");
+	printf("%i is greatest\n", g);
 }
