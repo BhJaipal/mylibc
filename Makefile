@@ -17,7 +17,7 @@ define TO_OBJ
 $(basename $(subst src,build,$1)).o
 endef
 
-build/%.o:
+build/%.o: src/%.c
 	gcc $(FLAGS) -o $@ -c $(call TO_SRC, $@)
 
 OBJ := $(foreach src, $(SRC), $(call TO_OBJ, $(src)))

@@ -1,5 +1,7 @@
 #include "c-impl.h"
 #include "types.h"
+#include "string.h"
+#include "malloc.h"
 
 size_t get_value(int loc) {
 	size_t out;
@@ -22,6 +24,7 @@ size_t get_value(int loc) {
 }
 
 char* format(const char *str, ...) {
+	asm("pop %rax");
 	size_t loc = 0;
 	size_t args[] = {get_value(2), get_value(3), get_value(4), get_value(5), get_value(6)};
 	size_t str_len = strlen(str);
@@ -187,10 +190,4 @@ char* formatn(const char *str, uint64 n, ...) {
 		}
 	}
 	return dest;
-}
-
-int main() {
-	char* dest = format("Hello %% %s %i", "World", 5);
-	println(dest);
-	free(dest);
 }

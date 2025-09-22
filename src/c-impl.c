@@ -36,7 +36,8 @@ char* u32to_str(uint32 x) {
 	char *out = malloc(13);
 	size_t out_len = 0;
 	if (x < 10) {
-		out[out_len] = x + 0x30;
+		out[0] = x + 0x30;
+		out[1] = 0;
 		return out;
 	}
 	while (x) {
@@ -44,6 +45,7 @@ char* u32to_str(uint32 x) {
 		x /= 10;
 		out_len++;
 	}
+	out[out_len] = 0;
 	return out;
 }
 
