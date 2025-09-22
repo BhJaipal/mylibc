@@ -1,7 +1,8 @@
 #include "c-impl.h"
 #include "types.h"
 #include "string.h"
-#include "malloc.h"
+#include <malloc.h>
+#include <stdarg.h>
 
 size_t get_value(int loc) {
 	size_t out;
@@ -22,7 +23,7 @@ size_t get_value(int loc) {
 	}
 	return out;
 }
-extern char* format_args(const char *str, size_t *args) {
+extern char* format_args(const char *str, va_list args) {
 	size_t loc = 0;
 	size_t str_len = strlen(str);
 	char mod = 0;
@@ -45,10 +46,10 @@ extern char* format_args(const char *str, size_t *args) {
 				mod = 0;
 				continue;
 			} else if (str[i] == 'c') {
-				dest[dest_len] = (uint8)args[loc];
+				dest[dest_len] = (uint8)va_arg(args, uint32);
 				dest_len++;
 			} else if (str[i] == 's') {
-				const char *out = (const char*)args[loc];
+				const char *out = va_arg(args, const char*);
 				strcat(dest, out);
 				dest_len += strlen(out);
 			} else if (str[i] == 'h') {
@@ -60,32 +61,32 @@ extern char* format_args(const char *str, size_t *args) {
 			} else if (str[i] == 'i') {
 				char st[24];
 				if (short_t == 2) {
-					i64to_str((int8)args[loc], 5, st);
+					i64to_str((int8)va_arg(args, int), 5, st);
 					short_t = 0;
 				} else if (short_t == 1) {
-					i64to_str((int16)args[loc], 7, st);
+					i64to_str((int16)va_arg(args, int), 7, st);
 					short_t = 0;
 				} else if (long_t) {
-					i64to_str((int64)args[loc], 22, st);
+					i64to_str(va_arg(args, int64), 22, st);
 					long_t = 0;
 				} else {
-					i64to_str((int32)args[loc], 13, st);
+					i64to_str(va_arg(args, int32), 13, st);
 				}
 				strcat(dest, st);
 				dest_len += strlen(st);
 			} else if (str[i] == 'u') {
 				char st[22];
 				if (short_t == 2) {
-					u64to_str((uint8)args[loc], 4, st);
+					u64to_str((uint8)va_arg(args, uint32), 4, st);
 					short_t = 0;
 				} else if (short_t == 1) {
-					u64to_str((uint16)args[loc], 6, st);
+					u64to_str((uint16)va_arg(args, uint32), 6, st);
 					short_t = 0;
 				} else if (long_t) {
-					u64to_str((uint64)args[loc], 22, st);
+					u64to_str(va_arg(args, uint64), 22, st);
 					long_t = 0;
 				} else {
-					u64to_str((uint32)args[loc], 13, st);
+					u64to_str(va_arg(args, uint32), 13, st);
 				}
 				dest_len += strlen(st);
 				strcat(dest, st);
@@ -105,11 +106,14 @@ extern char* format_args(const char *str, size_t *args) {
 }
 
 char* format(const char *str, ...) {
-	size_t args[] = {get_value(2), get_value(3), get_value(4), get_value(5), get_value(6)};
-	return format_args(str, args);
+	va_list args;
+	va_start(args, str);
+	char *out = format_args(str, args);
+	va_end(args);
+	return out;
 }
 
-char* formatn_args(const char *str, size_t n, size_t *args) {
+char* formatn_args(const char *str, size_t n, va_list args) {
 	size_t loc = 0;
 	size_t str_len = strlen(str);
 	char mod = 0;
@@ -131,10 +135,10 @@ char* formatn_args(const char *str, size_t n, size_t *args) {
 				mod = 0;
 				continue;
 			} else if (str[i] == 'c') {
-				dest[dest_len] = (uint8)args[loc];
+				dest[dest_len] = (uint8)va_arg(args, int32);
 				dest_len++;
 			} else if (str[i] == 's') {
-				const char *out = (const char*)args[loc];
+				const char *out = va_arg(args, const char*);
 				strcat(dest, out);
 				dest_len += strlen(out);
 			} else if (str[i] == 'h') {
@@ -146,32 +150,32 @@ char* formatn_args(const char *str, size_t n, size_t *args) {
 			} else if (str[i] == 'i') {
 				char st[22];
 				if (short_t == 2) {
-					i64to_str((int8)args[loc], 5, st);
+					i64to_str((int8)va_arg(args, int32), 5, st);
 					short_t = 0;
 				} else if (short_t == 1) {
-					i64to_str((int16)args[loc], 7, st);
+					i64to_str((int16)va_arg(args, int32), 7, st);
 					short_t = 0;
 				} else if (long_t) {
-					i64to_str((int64)args[loc], 22, st);
+					i64to_str(va_arg(args, int64), 22, st);
 					long_t = 0;
 				} else {
-					i64to_str((int32)args[loc], 13, st);
+					i64to_str(va_arg(args, int32), 13, st);
 				}
 				strcat(dest, st);
 				dest_len += strlen(st);
 			} else if (str[i] == 'u') {
 				char st[22];
 				if (short_t == 2) {
-					u64to_str((uint8)args[loc], 4, st);
+					u64to_str((uint8)va_arg(args, uint32), 4, st);
 					short_t = 0;
 				} else if (short_t == 1) {
-					u64to_str((uint16)args[loc], 6, st);
+					u64to_str((uint16)va_arg(args, uint32), 6, st);
 					short_t = 0;
 				} else if (long_t) {
-					u64to_str((uint64)args[loc], 22, st);
+					u64to_str(va_arg(args, uint64), 22, st);
 					long_t = 0;
 				} else {
-					u64to_str((uint32)args[loc], 13, st);
+					u64to_str(va_arg(args, uint32), 13, st);
 				}
 				dest_len += strlen(st);
 				strcat(dest, st);
@@ -190,6 +194,9 @@ char* formatn_args(const char *str, size_t n, size_t *args) {
 	return dest;
 }
 char* formatn(const char *str, uint64 n, ...) {
-	size_t args[] = {get_value(3), get_value(4), get_value(5), get_value(6)};
-	return formatn_args(str, n, args);
+	va_list args;
+	va_start(args, n);
+	char *out = formatn_args(str, n, args);
+	va_end(args);
+	return out;
 }

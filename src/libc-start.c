@@ -1,6 +1,6 @@
-#include "syscall.h"
+#include <syscall.h>
 
-void* heap_init(size_t heap_size);
+void* heap_init();
 
 void set_global_heap(void *_heap);
 void global_heap_destroy();
@@ -11,7 +11,7 @@ void _libc_main() {
 	char **argv;
 	asm("mov %%rsi, %0\n":"=r"(argc));
 	asm("mov %%rdx, %0\n":"=r"(argv));
-	set_global_heap(heap_init(1096));
+	set_global_heap(heap_init());
 	int status = main(argc, argv);
 	global_heap_destroy();
 	exit(status);

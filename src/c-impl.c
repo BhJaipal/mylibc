@@ -1,7 +1,7 @@
 #include "c-impl.h"
 #include "file.h"
 #include "types.h"
-#include "syscall.h"
+#include <syscall.h>
 #include "string.h"
 
 #define ST (size_t)

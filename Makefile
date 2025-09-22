@@ -17,6 +17,15 @@ define TO_OBJ
 $(basename $(subst src,build,$1)).o
 endef
 
+asm:
+	gcc $(FLAGS) $(call MAIN_FN, $@) -S
+
+all:
+	gcc $(FLAGS) $(call MAIN_FN, $@) $(LIB) $(ASM)
+
+examples/%.c:
+	gcc $(FLAGS) $@ $(LIB) $(ASM)
+
 build/%.o: src/%.c
 	gcc $(FLAGS) -o $@ -c $(call TO_SRC, $@)
 
@@ -39,9 +48,6 @@ test:
 	gcc $(FLAGS) src/test.c tests/$(TEST).c $(LIB) $(ASM) -o $(TEST)-test.exe
 	./$(TEST)-test.exe $(TEST);
 
-all:
-	gcc $(FLAGS) $(call MAIN_FN, $@) $(LIB) $(ASM)
-
 .ONESHELL:
 compile:
 	echo $(OBJ)
@@ -51,10 +57,6 @@ compile:
 shared:
 	gcc $(FLAGS) $(OBJ) -shared -o $(LIB)
 	echo -e "\e[92mBuilt done $(LIB) successfully\e[0m"
-
-asm:
-	if [ ! -d build ]; then mkdir build; fi
-	gcc $(FLAGS) c-impl.c -S -o build/c-impl.s 
 
 build-clean:
 	rm build/*.o

@@ -1,12 +1,9 @@
 #include "file.h"
-#include "c-impl.h"
-#include "libc_struct/file.h"
-#include "libc_struct/stat.h"
 #include "syscall.h"
 #include "syscall_enum.h"
-#include "types.h"
 #include "stat.h"
 #include <string.h>
+#include <stdarg.h>
 
 #define ST (size_t)
 
@@ -49,14 +46,18 @@ File* fopen(char *path, FileOpenFlags flags, ...) {
 	return file;
 }
 void printf(const char *fmt, ...) {
-	size_t args[] = {get_value(2), get_value(3), get_value(4), get_value(5), get_value(6)};
+	va_list args;
+	va_start(args, fmt);
 	char *out = format_args(fmt, args);
+	va_end(args);
 	print(out);
 	free(out);
 }
 void fprintf(File *file, const char *fmt, ...) {
-	size_t args[] = {get_value(3), get_value(4), get_value(5), get_value(6)};
+	va_list args;
+	va_start(args, fmt);
 	char *out = format_args(fmt, args);
+	va_end(args);
 	size_t out_len = strlen(out);
 	write(file->fd, (uint8*)out, out_len);
 	file->file_size = out_len;

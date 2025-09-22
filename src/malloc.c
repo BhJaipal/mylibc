@@ -1,16 +1,15 @@
 #include "malloc.h"
 #include "syscall.h"
 #include "syscall_enum.h"
-
 #define ST (size_t)
 
-void *mmap (void *__addr, size_t __len, PageProtection __prot,
-		   MapProps __flags, int __fd, long __offset) {
-	size_t ptr = SYSCALL(SYS_mmap, 6, ST __addr, __len, __prot, __flags, __fd, __offset);
+void *mmap (void *addr, size_t len, PageProtection prot,
+		   MapProps flags, int fd, long offset) {
+	size_t ptr = SYSCALL(SYS_mmap, 6, ST addr, len, prot, flags, fd, offset);
 	return ptr == -1 ? null : (void*)ptr;
 }
-int mprotect(void *__addr, size_t __len, PageProtection __prot) {
-	return SYSCALL(SYS_mprotect, 3, ST __addr, __len, __prot);
+int mprotect(void *addr, size_t len, PageProtection prot) {
+	return SYSCALL(SYS_mprotect, 3, ST addr, len, prot);
 }
 void munmap(void *ptr, size_t size) {
 	SYSCALL(SYS_munmap, 2, ST ptr, size);
