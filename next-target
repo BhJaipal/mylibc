@@ -1,1 +1,3 @@
-Add %X %x %p
+%b
+Hmm, maybe more syscalls
+or parse out hex, octal, ptr

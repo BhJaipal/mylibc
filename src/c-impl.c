@@ -52,6 +52,121 @@ char* u64to_str(uint64 x, uint8 size, char *out) {
 	return out;
 }
 
+char* ptr_to_str(void *ptr, char *out) {
+	size_t x = (size_t)ptr;
+	strcat(out, "0x");
+	size_t out_len = 2;
+	if (x < 16) {
+		out[0] = x + 0x30;
+		out[1] = 0;
+		out_len++;
+		return out;
+	}
+	while (x) {
+		uint8 o = x % 16;
+		if (o <= 9 && o >= 0)
+			out[out_len] = o + 0x30;
+		else
+			out[out_len] = o - 10 + 0x61;
+		x /= 16;
+		out_len++;
+	}
+	out[out_len] = 0;
+	
+	char *str_start = out + 2;
+	size_t s_len = strlen(str_start);
+	
+	for (size_t i = 0; i < s_len / 2; i++) {
+		str_start[i] ^= str_start[s_len - i -1];
+		str_start[s_len - i - 1] ^= str_start[i];
+		str_start[i] ^= str_start[s_len - i -1];
+	}
+	return out;
+}
+char* octal_to_str(size_t x, char *out) {
+	strcat(out, "0");
+	size_t out_len = 1;
+	if (x < 8) {
+		out[0] = x + 0x30;
+		out[1] = 0;
+		out_len++;
+		return out;
+	}
+	while (x) {
+		uint8 o = x % 8;
+		out[out_len] = o + 0x30;
+		x /= 8;
+		out_len++;
+	}
+	out[out_len] = 0;
+	
+	char *str_start = out + 1;
+	size_t s_len = strlen(str_start);
+	
+	for (size_t i = 0; i < s_len / 2; i++) {
+		str_start[i] ^= str_start[s_len - i -1];
+		str_start[s_len - i - 1] ^= str_start[i];
+		str_start[i] ^= str_start[s_len - i -1];
+	}
+	return out;
+}
+
+char* hex_lower_to_str(size_t x, char *out) {
+	size_t out_len = 0;
+	if (x < 16) {
+		out[0] = x + 0x30;
+		out[1] = 0;
+		out_len++;
+		return out;
+	}
+	while (x) {
+		uint8 o = x % 16;
+		if (o <= 9 && o >= 0)
+			out[out_len] = o + 0x30;
+		else
+			out[out_len] = o - 10 + 0x61;
+		x /= 16;
+		out_len++;
+	}
+	out[out_len] = 0;
+	
+	for (size_t i = 0; i < out_len / 2; i++) {
+		out[i] ^= out[out_len - i -1];
+		out[out_len - i - 1] ^= out[i];
+		out[i] ^= out[out_len - i -1];
+	}
+	return out;
+}
+
+char* hex_upper_to_str(size_t x, char *out) {
+	size_t out_len = 0;
+	if (x < 16) {
+		out[0] = x + 0x30;
+		out[1] = 0;
+		out_len++;
+		return out;
+	}
+	while (x) {
+		uint8 o = x % 16;
+		if (o <= 9 && o >= 0)
+			out[out_len] = o + 0x30;
+		else
+			out[out_len] = o - 10 + 0x41;
+		x /= 16;
+		out_len++;
+	}
+	out[out_len] = 0;
+	
+	char *str_start = out + 2;
+	size_t s_len = strlen(str_start);
+	
+	for (size_t i = 0; i < out_len / 2; i++) {
+		out[i] ^= out[out_len - i -1];
+		out[out_len - i - 1] ^= out[i];
+		out[i] ^= out[out_len - i -1];
+	}
+	return out;
+}
 uint32 read_uint() {
 	uint32 x = 0;
 	char num[11];

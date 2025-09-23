@@ -10,7 +10,7 @@
 void read(int fd, char *msg, int len) {
 	syscall(SYS_read, fd, ST msg, len, 0, 0, 0);
 }
-void write(int fd, uint8 *msg, int len) {
+void write(int fd, const char *msg, int len) {
 	syscall(SYS_write, fd, ST msg, len, 0, 0, 0);
 }
 int open(const char *path, FileOpenFlags flags, ...) {
@@ -59,13 +59,13 @@ void fprintf(File *file, const char *fmt, ...) {
 	char *out = format_args(fmt, args);
 	va_end(args);
 	size_t out_len = strlen(out);
-	write(file->fd, (uint8*)out, out_len);
+	write(file->fd, out, out_len);
 	file->file_size = out_len;
 	free(file->file_start);
 	file->file_start = out;
 	file->current_pos = out;
 }
-void fwrite(File *file, uint8 *buffer, size_t n) {
+void fwrite(File *file, const char *buffer, size_t n) {
 	write(file->fd, buffer, n);
 }
 void fclose(File *file) {

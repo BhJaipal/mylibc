@@ -23,7 +23,7 @@ size_t get_value(int loc) {
 	}
 	return out;
 }
-extern char* format_args(const char *str, va_list args) {
+char* format_args(const char *str, va_list args) {
 	size_t loc = 0;
 	size_t str_len = strlen(str);
 	char mod = 0;
@@ -50,6 +50,26 @@ extern char* format_args(const char *str, va_list args) {
 				dest_len++;
 			} else if (str[i] == 's') {
 				const char *out = va_arg(args, const char*);
+				strcat(dest, out);
+				dest_len += strlen(out);
+			} else if (str[i] == 'p') {
+				char out[11];
+				ptr_to_str(va_arg(args, void*), out);
+				strcat(dest, out);
+				dest_len += strlen(out);
+			} else if (str[i] == 'x') {
+				char out[11];
+				hex_lower_to_str(va_arg(args, size_t), out);
+				strcat(dest, out);
+				dest_len += strlen(out);
+			} else if (str[i] == 'o') {
+				char out[20];
+				octal_to_str(va_arg(args, size_t), out);
+				strcat(dest, out);
+				dest_len += strlen(out);
+			} else if (str[i] == 'X') {
+				char out[11];
+				hex_upper_to_str(va_arg(args, size_t), out);
 				strcat(dest, out);
 				dest_len += strlen(out);
 			} else if (str[i] == 'h') {
@@ -144,6 +164,26 @@ char* formatn_args(const char *str, size_t n, va_list args) {
 			} else if (str[i] == 'h') {
 				short_t++;
 				continue;
+			} else if (str[i] == 'p') {
+				char out[11];
+				ptr_to_str(va_arg(args, void*), out);
+				strcat(dest, out);
+				dest_len += strlen(out);
+			} else if (str[i] == 'x') {
+				char out[11];
+				hex_lower_to_str(va_arg(args, size_t), out);
+				strcat(dest, out);
+				dest_len += strlen(out);
+			} else if (str[i] == 'o') {
+				char out[20];
+				octal_to_str(va_arg(args, size_t), out);
+				strcat(dest, out);
+				dest_len += strlen(out);
+			} else if (str[i] == 'X') {
+				char out[11];
+				hex_upper_to_str(va_arg(args, size_t), out);
+				strcat(dest, out);
+				dest_len += strlen(out);
 			} else if (str[i] == 'l') {
 				long_t = 1;
 				continue;
