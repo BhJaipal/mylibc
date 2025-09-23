@@ -5,14 +5,14 @@
 
 void *mmap (void *addr, size_t len, PageProtection prot,
 		   MapProps flags, int fd, long offset) {
-	size_t ptr = SYSCALL(SYS_mmap, 6, ST addr, len, prot, flags, fd, offset);
+	size_t ptr = syscall(SYS_mmap, ST addr, len, prot, flags, fd, offset);
 	return ptr == -1 ? null : (void*)ptr;
 }
 int mprotect(void *addr, size_t len, PageProtection prot) {
-	return SYSCALL(SYS_mprotect, 3, ST addr, len, prot);
+	return syscall(SYS_mprotect, ST addr, len, prot, 0, 0, 0);
 }
 void munmap(void *ptr, size_t size) {
-	SYSCALL(SYS_munmap, 2, ST ptr, size);
+	syscall(SYS_munmap, ST ptr, size, 0, 0, 0, 0);
 }
 
 typedef enum {

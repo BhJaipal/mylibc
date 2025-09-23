@@ -20,7 +20,7 @@ endef
 asm:
 	gcc $(FLAGS) $(call MAIN_FN, $@) -S
 
-all:
+run:
 	gcc $(FLAGS) $(call MAIN_FN, $@) $(LIB) $(ASM)
 
 examples/%.c:

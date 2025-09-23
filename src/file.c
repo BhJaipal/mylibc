@@ -8,30 +8,30 @@
 #define ST (size_t)
 
 void read(int fd, char *msg, int len) {
-	SYSCALL(SYS_read, 3, fd, ST msg, len);
+	syscall(SYS_read, fd, ST msg, len, 0, 0, 0);
 }
 void write(int fd, uint8 *msg, int len) {
-	SYSCALL(SYS_write, 3, fd, ST msg, len);
+	syscall(SYS_write, fd, ST msg, len, 0, 0, 0);
 }
 int open(const char *path, FileOpenFlags flags, ...) {
 	long fd;
 	if (!(flags & O_CREAT)) {
-		fd = SYSCALL(SYS_open, 3, ST path, flags, 0444);
+		fd = syscall(SYS_open, ST path, flags, 0444, 0, 0, 0);
 	} else {
-		fd = SYSCALL(SYS_open, 3, ST path, flags, fd);
+		fd = syscall(SYS_open, ST path, flags, fd, 0, 0, 0);
 	}
 	return fd;
 }
 void close(int fd) {
-	SYSCALL(SYS_close, 1, fd);
+	syscall(SYS_close, fd, 0, 0, 0, 0, 0);
 }
 
 File* fopen(char *path, FileOpenFlags flags, ...) {
 	long fd;
 	if (!(flags & O_CREAT)) {
-		fd = SYSCALL(SYS_open, 3, ST path, flags, 0444);
+		fd = syscall(SYS_open, ST path, flags, 0444, 0, 0, 0);
 	} else {
-		fd = SYSCALL(SYS_open, 3, ST path, flags, fd);
+		fd = syscall(SYS_open, ST path, flags, fd, 0, 0, 0);
 	}
 	if (fd) return null;
 

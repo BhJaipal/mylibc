@@ -12,7 +12,10 @@ int main() {
 	println(name);
 	free(name);
 
-	void *heap = heap_new(PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1);
+	// Create your own heap allocator with
+	// your own protections, flags and 00fd
+	void *heap = heap_new(PROT_READ | PROT_WRITE,
+					   MAP_ANONYMOUS | MAP_PRIVATE, -1);
 	name = heap_malloc(heap, 5);
 	strcpy(name, "Hema");
 	println(name);

@@ -1,5 +1,5 @@
-#include "c-impl.h"
-#include "file.h"
+#include <c-impl.h>
+#include <file.h>
 
 int main(int argc, char **argv) {
 	printf("[");
@@ -12,6 +12,7 @@ int main(int argc, char **argv) {
 	println("]");
 
 	print("Enter 3 numbers: ");
+	// scanf not ready yet
 	int a = read_int();
 	int b = read_int();
 	int c = read_int();
