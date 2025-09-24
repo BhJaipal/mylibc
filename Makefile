@@ -1,7 +1,7 @@
 SHELL = /bin/bash
 FLAGS = -nostdlib -nostdinc -Wno-builtin-declaration-mismatch -g -fPIC -I.
-SRC := ./src/syscall.c ./src/c-impl.c ./src/malloc.c ./src/libc-start.c ./src/string.c ./src/file.c ./src/format.c ./src/stat.c
-ASM := ./asm-impl.s
+SRC := $(wildcard ./src/*.c)
+START := ./start/asm-impl.s ./start/libc-start.c
 LIB = ./mylibc.so
 
 TESTS := $(foreach test,$(wildcard tests/*.c), $(subst .c,,$(subst tests/,,$(test))))
@@ -17,14 +17,11 @@ define TO_OBJ
 $(basename $(subst src,build,$1)).o
 endef
 
-asm:
-	gcc $(FLAGS) $(call MAIN_FN, $@) -S
-
 run:
-	gcc $(FLAGS) $(call MAIN_FN, $@) $(LIB) $(ASM)
+	gcc $(FLAGS) $(call MAIN_FN, $@) $(LIB) $(START)
 
 examples/%.c:
-	gcc $(FLAGS) $@ $(LIB) $(ASM)
+	gcc $(FLAGS) $@ $(LIB) $(START)
 
 build/%.o: src/%.c
 	gcc $(FLAGS) -o $@ -c $(call TO_SRC, $@)
@@ -45,22 +42,18 @@ test-all:
 
 .ONESHELL:
 test:
-	gcc $(FLAGS) src/test.c tests/$(TEST).c $(LIB) $(ASM) -o $(TEST)-test.exe
-	./$(TEST)-test.exe $(TEST);
+	gcc $(FLAGS) src/test.c tests/$(TEST).c $(LIB) $(START) -o $(TEST)-test.exe
+	./$(TEST)-test.exe $(TEST)
 
 .ONESHELL:
 compile:
-	echo $(OBJ)
 	$(foreach s, $(OBJ), make $(s);)
 	echo -e "\e[92mCompiled all done source files\e[0m"
 
-shared:
+shared: $(OBJ)
 	gcc $(FLAGS) $(OBJ) -shared -o $(LIB)
 	echo -e "\e[92mBuilt done $(LIB) successfully\e[0m"
 
-build-clean:
-	rm build/*.o
-	rm ./mylibc.so
 clean:
 	rm a.out
 	rm *-test.exe

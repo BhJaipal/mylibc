@@ -1,4 +1,5 @@
 #include "file.h"
+#include "libc_enum.h"
 #include "syscall.h"
 #include "syscall_enum.h"
 #include "stat.h"
@@ -13,6 +14,12 @@ void read(int fd, char *msg, int len) {
 void write(int fd, const char *msg, int len) {
 	syscall(SYS_write, fd, ST msg, len, 0, 0, 0);
 }
+int pread(unsigned int fd, char *buf, size_t count, size_t pos) {
+	return syscall(SYS_pread64, fd, ST buf, count, pos, 0, 0);
+}
+int pwrite(unsigned int fd, char *buf, size_t count, size_t pos) {
+	return syscall(SYS_pwrite64, fd, ST buf, count, pos, 0, 0);
+}
 int open(const char *path, FileOpenFlags flags, ...) {
 	long fd;
 	if (!(flags & O_CREAT)) {
@@ -26,14 +33,41 @@ void close(int fd) {
 	syscall(SYS_close, fd, 0, 0, 0, 0, 0);
 }
 
-File* fopen(char *path, FileOpenFlags flags, ...) {
-	long fd;
-	if (!(flags & O_CREAT)) {
-		fd = syscall(SYS_open, ST path, flags, 0444, 0, 0, 0);
-	} else {
-		fd = syscall(SYS_open, ST path, flags, fd, 0, 0, 0);
+File* fopen(char *path, char *modes) {
+	FileOpenFlags flags;
+	for (size_t i = 0; i < strlen(modes); i++) {
+		if (modes[i] == 'r') {
+			if (flags & O_WRONLY) {
+				flags = O_RDWR & O_CREAT;
+			} else if (flags & O_APPEND) {
+				flags |= O_RDONLY;
+			} else {
+				flags = O_RDONLY;
+			}
+		} else if (modes[i] == 'w') {
+			if (flags & O_RDONLY) {
+				flags = O_RDWR | O_CREAT;
+			} else {
+				flags = O_CREAT | O_WRONLY;
+			}
+		} else if (modes[i] == 'a') {
+			if (flags & O_RDONLY) {
+				flags = O_APPEND | O_CREAT | O_RDONLY;
+			} else {
+				flags = O_CREAT | O_APPEND;
+			}
+		} else if (modes[i] == '+') {
+			if (flags & O_RDONLY) {
+				flags = O_RDWR | O_CREAT | O_RDONLY;
+			} else {
+				flags = O_CREAT | O_APPEND | O_RDONLY;
+			}
+		}
 	}
-	if (fd) return null;
+
+	long fd;
+	fd = syscall(SYS_open, ST path, flags, 0444, 0, 0, 0);
+	if (fd < 0) return null;
 
 	File *file = malloc(sizeof(File));
 	file->fd = fd;
