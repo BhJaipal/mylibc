@@ -4,7 +4,13 @@
 
 size_t syscall(long rax, long rdi, long rsi, long rdx, long r10, long r8, long r9);
 
-void exit(int status);
+extern void exit(int status);
+extern int kill(int pid, int sig);
+extern int getpid();
+extern int pause();
+extern int alarm(uint32 seconds);
+extern int vfork();
+extern int fork();
 
 /* Data structure describing a polling request.  */
 struct pollfd {

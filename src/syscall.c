@@ -31,3 +31,25 @@ int poll(struct pollfd *ufds, uint64 __nfds, int __timeout) {
 int lseek(uint64 fd, int64 offset, uint32 whence) {
 	return syscall(SYS_lseek, fd, offset, whence, 0, 0, 0);
 }
+
+int vfork() {
+        return syscall(SYS_vfork, 0, 0, 0, 0, 0, 0);
+}
+
+int fork() {
+        return syscall(SYS_fork, 0, 0, 0, 0, 0, 0);
+}
+int alarm(uint32 seconds) {
+        return syscall(SYS_alarm, seconds, 0, 0, 0, 0, 0);
+}
+int pause() {
+        return syscall(SYS_pause, 0, 0, 0, 0, 0, 0);
+}
+
+int getpid() {
+        return syscall(SYS_getpid, 0, 0, 0, 0, 0, 0);
+}
+
+int kill(int pid, int sig) {
+	return syscall(SYS_kill, pid, sig, 0, 0, 0, 0);
+}
