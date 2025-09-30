@@ -30,6 +30,7 @@ extern int lseek(uint64 fd, int64 offset, uint32 whence);
 #define R10 "r10"
 #define R8   "r8"
 #define R9   "r9"
+#define SYSCALL_EXEC asm("syscall\n");
 #else
 #define RAX "eax"
 #define RDI "ebx"
@@ -38,6 +39,10 @@ extern int lseek(uint64 fd, int64 offset, uint32 whence);
 #define R10 "esi"
 #define R8  "edi"
 #define R9  "ebp"
+#define SYSCALL_EXEC asm("\nint 0x80\n");
 #endif
+
+#define MOV(dest_reg, src_val) \
+	asm("mov %0, %%" dest_reg "\n"::"r"(src_val));
 
 #endif // !MY_SYSCALL_H

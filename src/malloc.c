@@ -2,17 +2,32 @@
 #include "syscall.h"
 #include "syscall_enum.h"
 #define ST (size_t)
+#define SYSCALL(ret, rax, ...)				\
+	size_t argv[] = {__VA_ARGS__};			\
+	size_t n = sizeof(argv)/sizeof(size_t); \
+	if (n > 0) MOV(RDI, argv[0])			\
+	if (n > 1) MOV(RSI, argv[1])			\
+	if (n > 2) MOV(RDX, argv[2])			\
+	if (n > 3) MOV(R10, argv[3])			\
+	if (n > 4) MOV(R8, argv[4]) 			\
+	if (n > 5) MOV(R9, argv[5]) 			\
+	size_t __rax = rax; 					\
+	asm("mov %0, %%"RAX::"r"(__rax));		\
+	SYSCALL_EXEC							\
+	size_t _out;							\
+	asm("mov %%"RAX", %0\n":"=r"(_out));	\
+	ret _out;
 
 void *mmap (void *addr, size_t len, PageProtection prot,
 		   MapProps flags, int fd, long offset) {
-	size_t ptr = syscall(SYS_mmap, ST addr, len, prot, flags, fd, offset);
+	SYSCALL(size_t ptr = , SYS_mmap, ST addr, len, prot, flags, fd, offset);
 	return ptr == -1 ? null : (void*)ptr;
 }
 int mprotect(void *addr, size_t len, PageProtection prot) {
-	return syscall(SYS_mprotect, ST addr, len, prot, 0, 0, 0);
+	SYSCALL(return, SYS_mprotect, ST addr, len, prot);
 }
 void munmap(void *ptr, size_t size) {
-	syscall(SYS_munmap, ST ptr, size, 0, 0, 0, 0);
+	SYSCALL(, SYS_munmap, ST ptr, size);
 }
 
 typedef enum {
@@ -34,6 +49,7 @@ typedef struct {
 	MapProps flags;
 	int fd;
 } Heap;
+
 
 Heap* heap_init() {
 	Heap *heap = mmap(null, sizeof(Heap), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);

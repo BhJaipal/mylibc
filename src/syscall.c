@@ -1,10 +1,6 @@
 #include "syscall.h"
 #include "syscall_enum.h"
 
-void exit(int status) {
-	syscall(SYS_exit, status, 0, 0, 0, 0, 0);
-	__builtin_unreachable();
-}
 size_t syscall(long rax, long rdi, long rsi, long rdx, long r10, long r8, long r9) {
 	asm("mov %0, %%"RDI"\n"::"r"(rdi));
 	asm("mov %0, %%"RSI"\n"::"r"(rsi));
@@ -14,42 +10,57 @@ size_t syscall(long rax, long rdi, long rsi, long rdx, long r10, long r8, long r
 	asm("mov %0, %%"R9"\n"::"r"(r9));
 
 	size_t out;
-#if defined __x86_64 || defined __x86_64__
-	asm("mov %0, %%rax\n"::"r"(rax));
-	asm("\nsyscall\n");
-	asm("mov %%rax, %0\n":"=r"(out));
-#else
-	asm("mov %0, %%eax\n"::"r"(rax));
-	asm("\nint 0x80\n");
-	asm("mov %%eax, %0\n":"=r"(out));
-#endif
+	asm("mov %0, %%"RAX"\n"::"r"(rax));
+	SYSCALL_EXEC;
+	asm("mov %%"RAX", %0\n":"=r"(out));
 	return out;
 }
+
+#define SYSCALL(ret, rax, ...)				\
+	size_t argv[] = {__VA_ARGS__};			\
+	size_t n = sizeof(argv)/sizeof(size_t); \
+	if (n > 0) MOV(RDI, argv[0])			\
+	if (n > 1) MOV(RSI, argv[1])			\
+	if (n > 2) MOV(RDX, argv[2])			\
+	if (n > 3) MOV(R10, argv[3])			\
+	if (n > 4) MOV(R8, argv[4]) 			\
+	if (n > 5) MOV(R9, argv[5]) 			\
+	size_t __rax = rax; 					\
+	asm("mov %0, %%"RAX::"r"(__rax));		\
+	SYSCALL_EXEC							\
+	size_t _out;							\
+	asm("mov %%"RAX", %0\n":"=r"(_out));	\
+	ret _out;
+
+void exit(int status) {
+	SYSCALL(, SYS_exit, status);
+	__builtin_unreachable();
+}
 int poll(struct pollfd *ufds, uint64 __nfds, int __timeout) {
-	return syscall(SYS_poll, (size_t)ufds, __nfds, __timeout, 0, 0, 0);
+	SYSCALL(return, SYS_poll, (size_t)ufds, __nfds, __timeout);
 }
 int lseek(uint64 fd, int64 offset, uint32 whence) {
-	return syscall(SYS_lseek, fd, offset, whence, 0, 0, 0);
+	SYSCALL(return, SYS_lseek, fd, offset, whence);
 }
 
 int vfork() {
-        return syscall(SYS_vfork, 0, 0, 0, 0, 0, 0);
+	SYSCALL(return, SYS_vfork);
 }
 
 int fork() {
-        return syscall(SYS_fork, 0, 0, 0, 0, 0, 0);
+	SYSCALL(return, SYS_fork);
 }
 int alarm(uint32 seconds) {
-        return syscall(SYS_alarm, seconds, 0, 0, 0, 0, 0);
+	SYSCALL(return, SYS_alarm, seconds);
 }
 int pause() {
-        return syscall(SYS_pause, 0, 0, 0, 0, 0, 0);
+	SYSCALL(return, SYS_pause);
 }
 
 int getpid() {
-        return syscall(SYS_getpid, 0, 0, 0, 0, 0, 0);
+	SYSCALL(return, SYS_getpid);
 }
 
 int kill(int pid, int sig) {
-	return syscall(SYS_kill, pid, sig, 0, 0, 0, 0);
+	SYSCALL(return, SYS_kill, pid, sig);
 }

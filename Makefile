@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-FLAGS = -nostdlib -nostdinc -Wno-builtin-declaration-mismatch -g -fPIC -I.
+FLAGS = -nostdlib -nostdinc -Wno-builtin-declaration-mismatch -g -fPIC -I. -z noexecstack
 SRC := $(wildcard ./src/*.c)
 START := ./start/asm-impl.s ./start/libc-start.c
 LIB = ./mylibc.so
@@ -42,7 +42,7 @@ test-all:
 
 .ONESHELL:
 test:
-	gcc $(FLAGS) src/test.c tests/$(TEST).c $(LIB) $(START) -o $(TEST)-test.exe
+	gcc $(FLAGS) test.c tests/$(TEST).c $(LIB) $(START) -o $(TEST)-test.exe
 	./$(TEST)-test.exe $(TEST)
 
 .ONESHELL:

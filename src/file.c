@@ -30,7 +30,7 @@ int open(const char *path, FileOpenFlags flags, ...) {
 	return fd;
 }
 void close(int fd) {
-	syscall(SYS_close, fd, 0, 0, 0, 0, 0);
+	 syscall(SYS_close, fd, 0, 0, 0, 0, 0);
 }
 
 File* fopen(char *path, char *modes) {
@@ -66,7 +66,7 @@ File* fopen(char *path, char *modes) {
 	}
 
 	long fd;
-	fd = syscall(SYS_open, ST path, flags, 0444, 0, 0, 0);
+	fd =  syscall(SYS_open, ST path, flags, 0444, 0, 0, 0);
 	if (fd < 0) return null;
 
 	File *file = malloc(sizeof(File));
