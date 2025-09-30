@@ -84,8 +84,7 @@ char* ptr_to_str(void *ptr, char *out) {
 	return out;
 }
 char* octal_to_str(size_t x, char *out) {
-	strcat(out, "0");
-	size_t out_len = 1;
+	size_t out_len = 0;
 	if (x < 8) {
 		out[0] = x + 0x30;
 		out[1] = 0;
@@ -100,7 +99,7 @@ char* octal_to_str(size_t x, char *out) {
 	}
 	out[out_len] = 0;
 	
-	char *str_start = out + 1;
+	char *str_start = out;
 	size_t s_len = strlen(str_start);
 	
 	for (size_t i = 0; i < s_len / 2; i++) {

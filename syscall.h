@@ -2,6 +2,10 @@
 #define MY_SYSCALL_H
 #include "types.h"
 
+#define SYSCALL(ret, rax, ...) \
+	size_t argv[] = {__VA_ARGS__, 0, 0, 0, 0, 0};\
+	ret syscall(rax, argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
+
 size_t syscall(long rax, long rdi, long rsi, long rdx, long r10, long r8, long r9);
 
 extern void exit(int status);

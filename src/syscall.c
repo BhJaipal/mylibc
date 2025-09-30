@@ -16,22 +16,6 @@ size_t syscall(long rax, long rdi, long rsi, long rdx, long r10, long r8, long r
 	return out;
 }
 
-#define SYSCALL(ret, rax, ...)				\
-	size_t argv[] = {__VA_ARGS__};			\
-	size_t n = sizeof(argv)/sizeof(size_t); \
-	if (n > 0) MOV(RDI, argv[0])			\
-	if (n > 1) MOV(RSI, argv[1])			\
-	if (n > 2) MOV(RDX, argv[2])			\
-	if (n > 3) MOV(R10, argv[3])			\
-	if (n > 4) MOV(R8, argv[4]) 			\
-	if (n > 5) MOV(R9, argv[5]) 			\
-	size_t __rax = rax; 					\
-	asm("mov %0, %%"RAX::"r"(__rax));		\
-	SYSCALL_EXEC							\
-	size_t _out;							\
-	asm("mov %%"RAX", %0\n":"=r"(_out));	\
-	ret _out;
-
 void exit(int status) {
 	SYSCALL(, SYS_exit, status);
 	__builtin_unreachable();
@@ -44,21 +28,21 @@ int lseek(uint64 fd, int64 offset, uint32 whence) {
 }
 
 int vfork() {
-	SYSCALL(return, SYS_vfork);
+	SYSCALL(return, SYS_vfork, 0);
 }
 
 int fork() {
-	SYSCALL(return, SYS_fork);
+	SYSCALL(return, SYS_fork, 0);
 }
 int alarm(uint32 seconds) {
 	SYSCALL(return, SYS_alarm, seconds);
 }
 int pause() {
-	SYSCALL(return, SYS_pause);
+	SYSCALL(return, SYS_pause, 0);
 }
 
 int getpid() {
-	SYSCALL(return, SYS_getpid);
+	SYSCALL(return, SYS_getpid, 0);
 }
 
 int kill(int pid, int sig) {

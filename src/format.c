@@ -65,8 +65,9 @@ char* format_args(const char *str, va_list args) {
 			} else if (str[i] == 'o') {
 				char out[20];
 				octal_to_str(va_arg(args, size_t), out);
+				strcat(dest, "0");
 				strcat(dest, out);
-				dest_len += strlen(out);
+				dest_len += strlen(out)+1;
 			} else if (str[i] == 'X') {
 				char out[11];
 				hex_upper_to_str(va_arg(args, size_t), out);
@@ -177,8 +178,9 @@ char* formatn_args(const char *str, size_t n, va_list args) {
 			} else if (str[i] == 'o') {
 				char out[20];
 				octal_to_str(va_arg(args, size_t), out);
+				strcat(dest, "0");
 				strcat(dest, out);
-				dest_len += strlen(out);
+				dest_len += strlen(out) + 1;
 			} else if (str[i] == 'X') {
 				char out[11];
 				hex_upper_to_str(va_arg(args, size_t), out);

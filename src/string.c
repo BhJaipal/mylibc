@@ -1,4 +1,5 @@
-#include "c-impl.h"
+#include <c-impl.h>
+#include <string.h>
 
 char toupper(char ch) {
 	if (ch >= 0x61 && ch <= 0x7a)

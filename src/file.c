@@ -9,28 +9,28 @@
 #define ST (size_t)
 
 void read(int fd, char *msg, int len) {
-	syscall(SYS_read, fd, ST msg, len, 0, 0, 0);
+	SYSCALL(, SYS_read, fd, ST msg, len);
 }
 void write(int fd, const char *msg, int len) {
-	syscall(SYS_write, fd, ST msg, len, 0, 0, 0);
+	SYSCALL(, SYS_write, fd, ST msg, len);
 }
 int pread(unsigned int fd, char *buf, size_t count, size_t pos) {
-	return syscall(SYS_pread64, fd, ST buf, count, pos, 0, 0);
+	SYSCALL(return, SYS_pread64, fd, ST buf, count, pos);
 }
 int pwrite(unsigned int fd, char *buf, size_t count, size_t pos) {
-	return syscall(SYS_pwrite64, fd, ST buf, count, pos, 0, 0);
+	SYSCALL(return, SYS_pwrite64, fd, ST buf, count, pos);
 }
 int open(const char *path, FileOpenFlags flags, ...) {
 	long fd;
 	if (!(flags & O_CREAT)) {
-		fd = syscall(SYS_open, ST path, flags, 0444, 0, 0, 0);
+		SYSCALL(fd = , SYS_open, ST path, flags, 0444);
 	} else {
-		fd = syscall(SYS_open, ST path, flags, fd, 0, 0, 0);
+		SYSCALL(fd = , SYS_open, ST path, flags, fd);
 	}
 	return fd;
 }
 void close(int fd) {
-	 syscall(SYS_close, fd, 0, 0, 0, 0, 0);
+	 SYSCALL(, SYS_close, fd);
 }
 
 File* fopen(char *path, char *modes) {
@@ -66,7 +66,7 @@ File* fopen(char *path, char *modes) {
 	}
 
 	long fd;
-	fd =  syscall(SYS_open, ST path, flags, 0444, 0, 0, 0);
+	SYSCALL(fd = , SYS_open, ST path, flags, 0444, 0, 0, 0);
 	if (fd < 0) return null;
 
 	File *file = malloc(sizeof(File));
