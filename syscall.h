@@ -15,6 +15,7 @@ extern int pause();
 extern int alarm(uint32 seconds);
 extern int vfork();
 extern int fork();
+extern int execve(const char *filename, const char *const *argv, const char *const *envp);
 
 /* Data structure describing a polling request.  */
 struct pollfd {

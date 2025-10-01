@@ -1,4 +1,4 @@
-#!/bin/python3.11
+#!/bin/python3
 import sys
 
 with open("./syscall.table", "r") as syscallf:
@@ -12,18 +12,12 @@ with open("./syscall.table", "r") as syscallf:
     for line in  syscalls:
         sys_args = line.split(": ")
         if sys_args[0] == syscall:
-            args = sys_args[1].split("|")
+            args = sys_args[1].strip().split("|")
             declaration = "extern int " + syscall + "("
             defination = "int " + syscall + "("
-            if "0" in args:
-                declaration += (", ".join(args[:args.index("0")]) + ");")
-                defination += (", ".join(args[:args.index("0")]) + ") {\n\treturn syscall(SYS_" + syscall + ", ")
-                print([a.split() for a in args])
-                args = map(lambda x: x if x == "0" else (x.split()[-1][1:] if x.split()[-1][0] == "*" else x.split()[-1]), args)
-            else:
-                declaration += (", ".join(args) + ");")
-                defination += (", ".join(args) + ") {\n\treturn syscall(SYS_" + syscall + ", ")
-                args = map(lambda x: (x.split()[-1][1:] if x.split()[-1][0] == "*" else x.split()[-1]), args)
+            declaration += (", ".join(args) + ");")
+            defination += (", ".join(args) + ") {\n\tSYSCALL(return, SYS_" + syscall + ", ")
+            args = map(lambda x: (x.split()[-1][1:] if x.split()[-1][0] == "*" else x.split()[-1]), args)
             defination += ", ".join(args)
             defination += ");\n}"
             print(declaration)

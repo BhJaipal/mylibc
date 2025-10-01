@@ -1,5 +1,4 @@
 #include "file.h"
-#include "libc_enum.h"
 #include "syscall.h"
 #include "syscall_enum.h"
 #include "stat.h"
@@ -86,6 +85,14 @@ void printf(const char *fmt, ...) {
 	va_end(args);
 	print(out);
 	free(out);
+}
+void dprintf(int fd, const char *fmt, ...) {
+	va_list args;
+	va_start(args, fmt);
+	char *out = format_args(fmt, args);
+	va_end(args);
+	size_t out_len = strlen(out);
+	write(fd, out, out_len);
 }
 void fprintf(File *file, const char *fmt, ...) {
 	va_list args;

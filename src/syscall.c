@@ -1,7 +1,23 @@
 #include "syscall.h"
 #include "syscall_enum.h"
+#include <net/socket.h>
+#define ST (size_t)
 
 size_t syscall(long rax, long rdi, long rsi, long rdx, long r10, long r8, long r9) {
+	asm("mov %0, %%"RDI"\n"::"r"(rdi));
+	asm("mov %0, %%"RSI"\n"::"r"(rsi));
+	asm("mov %0, %%"RDX"\n"::"r"(rdx));
+	asm("mov %0, %%"R10"\n"::"r"(r10));
+	asm("mov %0, %%"R8"\n"::"r"(r8));
+	asm("mov %0, %%"R9"\n"::"r"(r9));
+
+	size_t out;
+	asm("mov %0, %%"RAX"\n"::"r"(rax));
+	SYSCALL_EXEC;
+	asm("mov %%"RAX", %0\n":"=r"(out));
+	return out;
+}
+size_t syscall_ptr(long rax, const void *rdi, const void *rsi, const void *rdx, const void *r10, const void *r8, const void *r9) {
 	asm("mov %0, %%"RDI"\n"::"r"(rdi));
 	asm("mov %0, %%"RSI"\n"::"r"(rsi));
 	asm("mov %0, %%"RDX"\n"::"r"(rdx));
@@ -48,3 +64,20 @@ int getpid() {
 int kill(int pid, int sig) {
 	SYSCALL(return, SYS_kill, pid, sig);
 }
+
+int socket(ProtocolFamily domain, SocketType type, ProtocolFamily protocol) {
+	SYSCALL(return, SYS_socket, domain, type, protocol);
+}
+int bind(int sockfd, const SocketAddr *addr, socklen_t len) {
+	SYSCALL(return, SYS_bind, sockfd, (size_t) addr, len);
+}
+int listen(int sockfd, int backlog) {
+	SYSCALL(return, SYS_listen, sockfd, backlog);
+}
+int accept(int sockfd, const SocketAddr *addr, socklen_t *len) {
+	SYSCALL(return, SYS_accept, sockfd, (size_t) addr, (size_t) len);
+}
+int execve(const char *filename, const char *const *argv, const char *const *envp) {
+	return syscall_ptr(SYS_execve, filename, argv, envp, 0, 0, 0);
+}
+

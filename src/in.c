@@ -12,9 +12,7 @@ long htonl(long l) {
 	return out;
 }
 short htons(short l) {
-	short out = ((l & 0xff) << (8 * 3));
-	out |= (((l >> 8) & 0xff) << (8 * 2));
-	out |= (((l >> (8 * 2)) & 0xff) << (8));
-	out |= (((l >> (8 * 3)) & 0xff) << (0));
+	short out = ((l & 0xff) << 8);
+	out |= ((l >> 8) & 0xff);
 	return out;
 }
