@@ -1,6 +1,7 @@
 #include "malloc.h"
 #include "syscall.h"
 #include "syscall_enum.h"
+#include "types.h"
 #define ST (size_t)
 
 void *mmap (void *addr, size_t len, PageProtection prot,
@@ -96,12 +97,18 @@ void heap_delete_node(Heap *heap, void *val) {
 	}
 }
 
-Heap* heap = null;
+static Heap* access_global_heap(char is_write, Heap *new_heap) {
+	static Heap *heap = null;
+	if (is_write) {
+		heap = new_heap;
+	}
+	return heap;
+}
 void set_global_heap(void *_heap) {
-	heap = _heap;
+	access_global_heap(1, _heap);
 }
 void global_heap_destroy() {
-	heap_destroy(heap);
+	heap_destroy(access_global_heap(0, null));
 }
 
 void heap_update(Heap *heap, HeapEvent event, void *ptr, size_t len) {
@@ -138,7 +145,7 @@ void* heap_malloc(void *heap, size_t size) {
 void* malloc(size_t size) {
 	void *ptr = mmap(0, size, PROT_READ | PROT_WRITE,
 				  MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-	heap_update(heap, HeapAlloc, ptr, size);
+	heap_update(access_global_heap(0, null), HeapAlloc, ptr, size);
 	return ptr;
 }
 void* heap_realloc(void *heap, void *ptr, size_t size) {
@@ -165,7 +172,7 @@ void* realloc(void *ptr, size_t size) {
 	void *new_ptr = mmap(0, size, PROT_READ | PROT_WRITE,
 				  MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
-	Ptr *head = ((Heap*)heap)->head;
+	Ptr *head = access_global_heap(0, null)->head;
 	size_t len;
 	while (head) {
 		if (head->ptr != ptr)
@@ -186,5 +193,5 @@ void heap_free(void *heap, void *ptr) {
 }
 
 void free(void *ptr) {
-	heap_delete_node(heap, ptr);
+	heap_delete_node(access_global_heap(0, null), ptr);
 }

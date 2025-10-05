@@ -1,8 +1,10 @@
 SHELL = /bin/bash
-FLAGS = -nostdlib -nostdinc -Wno-builtin-declaration-mismatch -g -fPIC -I. -z noexecstack
+FLAGS = -nostdlib -nostdinc -Wno-builtin-declaration-mismatch -g -fPIC -I. -z noexecstack -Llib
 SRC := $(wildcard ./src/*.c)
 START := ./start/asm-impl.s ./start/libc-start.c
-LIB = ./mylibc.so
+LIB = myc
+LIBXX = myc++
+CC ?= gcc
 
 TESTS := $(foreach test,$(wildcard tests/*.c), $(subst .c,,$(subst tests/,,$(test))))
 
@@ -13,20 +15,38 @@ endef
 define TO_SRC
 $(basename $(subst build,src,$1)).c
 endef
+define TO_SRCPP
+$(basename $(subst build/cpp,src,$1)).c
+endef
 define TO_OBJ
 $(basename $(subst src,build,$1)).o
 endef
+define TO_OBJPP
+$(basename $(subst src,build/cpp,$1)).o
+endef
 
+b:
+	gcc $(FLAGS) $(call MAIN_FN, $@) -l$(LIB) $(START)
+bpp:
+	g++ $(FLAGS) -Ic++ -fpermissive -Wno-narrowing -fno-rtti $(call MAIN_FN, $@) ./c++/new.cpp ./start/asm-cpp-impl.s ./start/libc-start.c -l$(LIBXX)
+
+.ONESHELL:
 run:
-	gcc $(FLAGS) $(call MAIN_FN, $@) $(LIB) $(START)
+	export LD_LIBRARY_PATH=./lib
+	./a.out
 
 examples/%.c:
-	gcc $(FLAGS) $@ $(LIB) $(START)
+	$(CC) $(FLAGS) $@ $(LIB) $(START)
 
 build/%.o: src/%.c
-	gcc $(FLAGS) -o $@ -c $(call TO_SRC, $@)
+	$(CC) $(FLAGS) -o $@ -c $(call TO_SRC, $@)
+
+build/cpp/%.o: src/%.c
+	if [[ ! -d build/cpp ]]; then mkdir -p build/cpp; fi
+	g++ -fpermissive -Wno-narrowing $(FLAGS) -o $@ -c $(call TO_SRCPP, $@)
 
 OBJ := $(foreach src, $(SRC), $(call TO_OBJ, $(src)))
+OBJPP := $(foreach src, $(SRC), $(call TO_OBJPP, $(src)))
 
 .ONESHELL:
 test-all:
@@ -51,9 +71,16 @@ compile:
 	echo -e "\e[92mCompiled all done source files\e[0m"
 
 shared: $(OBJ)
-	gcc $(FLAGS) $(OBJ) -shared -o $(LIB)
-	echo -e "\e[92mBuilt done $(LIB) successfully\e[0m"
+	$(CC) $(FLAGS) $(OBJ) -shared -o lib/lib$(LIB).so
+	echo -e "\e[92mBuilt done lib$(LIB).so successfully\e[0m"
+
+sharedpp: $(OBJPP)
+	g++ $(FLAGS) $(OBJPP) -shared -o lib/lib$(LIBXX).so
+	echo -e "\e[92mBuilt done lib$(LIBXX).so successfully\e[0m"
 
 clean:
 	rm a.out
 	rm *-test.exe
+
+clean-build:
+	rm build/*.o

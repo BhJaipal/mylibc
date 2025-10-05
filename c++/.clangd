@@ -1,0 +1,6 @@
+CompileFlags:
+  Add:
+    - -nostdinc
+    - -nostdinc++
+    - -I..
+    - -I.
