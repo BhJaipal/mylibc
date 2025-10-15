@@ -1,4 +1,4 @@
-#include "../malloc.h"
+#include <malloc.h>
 
 void *operator new(size_t len) {
 	void *ptr = malloc(len);

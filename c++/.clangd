@@ -4,3 +4,6 @@ CompileFlags:
     - -nostdinc++
     - -I..
     - -I.
+    - -fpermissive
+    - -Wno-arith-conversion
+    - -Wno-pointer-arith

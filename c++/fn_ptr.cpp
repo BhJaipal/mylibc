@@ -1,4 +1,5 @@
 // #pragma once
+#include "heap.hpp"
 #include <new.hpp>
 #include <malloc.h>
 #include <file.h>
@@ -55,6 +56,7 @@ namespace std {
 
 int main() {
 	int c = 5;
+	std::Heap heap;
 	auto max_ = [c](int a, int b) -> int { return a > b ? (a>c?a:b) : (b>c?b:c); };
 	std::function<int(int, int)> max = max_;
 	int out = max(3, 5);
