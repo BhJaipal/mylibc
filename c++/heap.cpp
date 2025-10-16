@@ -54,6 +54,9 @@ namespace std {
 		}
 		if (curr->data_ != ptr.data_) return;
 		curr->is_free = true;
+		for (size_t i = 0;  i < curr->size_; i++) {
+			curr->data_[i] = 0;
+		}
 		if (curr->prev && curr->prev->is_free) {
 			curr->prev->size_ += curr->size_;
 			curr->prev->next = curr->next;
@@ -73,6 +76,36 @@ namespace std {
 	template<class T>
 	void pointer_t<T>::free() {
 		heap_.free(this);
+	}
+	template<class T>
+	void pointer_t<T>::realloc(size_t size) {
+		heap_.realloc(this, size);
+	}
+	void Heap::realloc(pointer_t<char> ptr, size_t size) {
+		Ptr* curr = head;
+		while (curr->next) {
+			if (curr->data_ == ptr.data_) break;
+			curr = curr->next;
+		}
+		if (curr->data_ != ptr.data_) return;
+		if (curr->next && curr->next->is_free && curr->next->size_ >= size - curr->size_) {
+			curr->next->size_ = size - curr->size_;
+			if (!curr->next->size_) {
+				curr->next = curr->next->next;
+				curr->next->prev = curr;
+				munmap(curr->next, sizeof(Ptr));
+			}
+			curr->size_ = size;
+		}
+		if (curr->prev && curr->prev->is_free && curr->prev->size_ >= size - curr->size_) {
+			curr->prev->size_ = size - curr->size_;
+			if (!curr->prev->size_) {
+				curr->next = curr->next->next;
+				curr->next->prev = curr;
+				munmap(curr->next, sizeof(Ptr));
+			}
+			curr->size_ = size;
+		}
 	}
 	void Heap::free_all_memory() {
 		munmap(head->data_, total_size);

@@ -48,7 +48,9 @@ public:
 	operator pointer_t<U>() {
 		return pointer_t<U>(data_, size_);
 	}
+	void realloc(size_t size);
 };
+
 #define NULL (Ptr *)0
 
 class Heap {
@@ -62,7 +64,7 @@ class Heap {
 		Ptr *prev;
 		bool is_free;
 	};
-	Ptr *head, *end;
+	Ptr *head = NULL, *end = NULL;
 
 	void free_all_memory();
 
@@ -77,6 +79,7 @@ public:
 	pointer_t<T> alloc(size_t size = 1);
 
 	void defragment(size_t minimum = 15);
+	void realloc(pointer_t<char> ptr, size_t size);
 
 	void destroy() {
 		if (fd_ >= 0) fd_ = -1;
