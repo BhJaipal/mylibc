@@ -3,7 +3,6 @@ FLAGS = -nostdlib -nostdinc -Wno-builtin-declaration-mismatch -g -fPIC -I. -z no
 SRC := $(wildcard ./src/*.c)
 START := ./start/asm-impl.s ./start/libc-start.c
 LIB = myc
-LIBXX = myc++
 CC ?= gcc
 
 TESTS := $(foreach test,$(wildcard tests/*.c), $(subst .c,,$(subst tests/,,$(test))))
@@ -28,7 +27,7 @@ endef
 b:
 	gcc $(FLAGS) $(call MAIN_FN, $@) -l$(LIB) $(START)
 bpp:
-	g++ $(FLAGS) -Ic++ -fpermissive -Wno-narrowing -fno-rtti $(call MAIN_FN, $@) ./c++/new.cpp ./start/asm-cpp-impl.s ./start/libc-start.c -l$(LIBXX)
+	g++ $(FLAGS) -Ic++ -fpermissive -Wno-narrowing -fno-rtti ./c++/heap.cpp $(call MAIN_FN, $@) ./c++/new.cpp $(START)pp -l$(LIB)
 
 .ONESHELL:
 run:

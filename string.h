@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+extern "C" {
 char toupper(char ch);
 char tolower(char ch);
 
@@ -16,5 +17,6 @@ int strcmp(const char *s1, const char *s2);
 int strncmp(const char *s1, const char *s2, size_t n);
 int strcmpcase(const char *s1, const char *s2);
 int strncmpcase(const char *s1, const char *s2, size_t n);
+}
 
 #endif // !MY_STRING_H

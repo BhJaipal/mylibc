@@ -2,8 +2,10 @@
 #define FILE_H
 #include "libc_struct/file.h"
 #include "format.h"
+#include "syscall.h"
 #include "types.h"
 
+EXPORT
 typedef enum {
 	O_ACCMODE= 0003,
 	O_RDONLY= 00,
@@ -31,18 +33,19 @@ typedef enum {
 } FileOpenFlags;
 
 
-extern void read(int fd, char *msg, int len);
-extern void write(int fd, const char *msg, int len);
-extern int open(const char *path, FileOpenFlags flags, ...);
-extern void close(int fd);
-extern int pread(unsigned int fd, char *buf, size_t count, size_t pos);
-extern int pwrite(unsigned int fd, char *buf, size_t count, size_t pos);
+void read(int fd, char *msg, int len);
+void write(int fd, const char *msg, int len);
+int open(const char *path, FileOpenFlags flags, ...);
+void close(int fd);
+int pread(unsigned int fd, char *buf, size_t count, size_t pos);
+int pwrite(unsigned int fd, char *buf, size_t count, size_t pos);
 
-extern void dprintf(int fd, const char *fmt, ...);
-extern File* fopen(char *path, char *modes);
-extern void printf(const char *fmt, ...);
-extern void fprintf(File *file, const char *fmt, ...);
-extern void fwrite(File *file, const char *buffer, size_t n);
-extern void fclose(File *file);
+void dprintf(int fd, const char *fmt, ...);
+File* fopen(char *path, char *modes);
+void printf(const char *fmt, ...);
+void fprintf(File *file, const char *fmt, ...);
+void fwrite(File *file, const char *buffer, size_t n);
+void fclose(File *file);
+EXPORT_END
 
 #endif // !FILE_H

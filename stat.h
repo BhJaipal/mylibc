@@ -1,6 +1,7 @@
 #ifndef STAT_H
 #include "libc_struct/stat.h"
 
+extern "C" {
 /* stat() and fstatat() retrieve information about the file pointed
        to by path;*/
 int stat(const char* path, Stat *statbuf);
@@ -15,5 +16,6 @@ int fstat(int fd, Stat *statbuf);
        file that the link refers to.*/
 int lstat(const char* path, Stat *statbuf);
 int statx(int dirfd, char *pathname, int flags, uint32 mask, Statx *statbuf);
+}
 
 #endif // !STAT_H

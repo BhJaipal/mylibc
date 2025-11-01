@@ -1,5 +1,4 @@
-// #pragma once
-#include "heap.hpp"
+#pragma once
 #include <new.hpp>
 #include <malloc.h>
 #include <file.h>
@@ -52,13 +51,4 @@ namespace std {
 			return p_base_->invoke(args...);
         }
     };
-}
-
-int main() {
-	int c = 5;
-	std::Heap heap;
-	auto max_ = [c](int a, int b) -> int { return a > b ? (a>c?a:b) : (b>c?b:c); };
-	std::function<int(int, int)> max = max_;
-	int out = max(3, 5);
-	printf("%i \n", out);
 }

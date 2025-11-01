@@ -2,26 +2,29 @@
 #define C_IMPL
 
 #include "types.h"
+#include "syscall.h"
 
-extern int rev_d(int x);
-extern char* i64to_str(int64 x, uint8 size, char *out);
-extern uint32 rev_u(uint32 x);
-extern char* u64to_str(uint64 x, uint8 size, char *out);
-extern char* ptr_to_str(void *ptr, char *out);
-extern char* hex_lower_to_str(size_t x, char *out);
-extern char* hex_upper_to_str(size_t x, char *out);
-extern char* octal_to_str(size_t x, char *out);
+EXPORT
+int rev_d(int x);
+char* i64to_str(int64 x, uint8 size, char *out);
+uint32 rev_u(uint32 x);
+char* u64to_str(uint64 x, uint8 size, char *out);
+char* ptr_to_str(void *ptr, char *out);
+char* hex_lower_to_str(size_t x, char *out);
+char* hex_upper_to_str(size_t x, char *out);
+char* octal_to_str(size_t x, char *out);
 
 /* C implementation */
-extern void putchar(char c);
-extern int pow(int b, int e);
-extern void write_uint(uint32 x);
-extern uint32 read_uint();
-extern void write_int(int x);
-extern int read_int();
+void putchar(char c);
+int pow(int b, int e);
+void write_uint(uint32 x);
+uint32 read_uint();
+void write_int(int x);
+int read_int();
 
-extern void print(const char *str);
+void print(const char *str);
 
-extern void println(const char *str);
+void println(const char *str);
+EXPORT_END
 
 #endif // !C_IMPL

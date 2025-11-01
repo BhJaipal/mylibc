@@ -2,20 +2,30 @@
 #define MY_SYSCALL_H
 #include "types.h"
 
+#if __cplusplus
+#define EXPORT extern "C" {
+#define EXPORT_END }
+#else
+#define EXPORT
+#define EXPORT_END
+#endif
+
+EXPORT
+
 #define SYSCALL(ret, rax, ...) \
 	size_t argv[] = {__VA_ARGS__, 0, 0, 0, 0, 0};\
 	ret syscall(rax, argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
 
 size_t syscall(long rax, long rdi, long rsi, long rdx, long r10, long r8, long r9);
 
-extern void exit(int status);
-extern int kill(int pid, int sig);
-extern int getpid();
-extern int pause();
-extern int alarm(uint32 seconds);
-extern int vfork();
-extern int fork();
-extern int execve(const char *filename, const char *const *argv, const char *const *envp);
+void exit(int status);
+int kill(int pid, int sig);
+int getpid();
+int pause();
+int alarm(uint32 seconds);
+int vfork();
+int fork();
+int execve(const char *filename, const char *const *argv, const char *const *envp);
 
 /* Data structure describing a polling request.  */
 struct pollfd {
@@ -49,5 +59,7 @@ extern int lseek(uint64 fd, int64 offset, uint32 whence);
 
 #define MOV(dest_reg, src_val) \
 	asm("mov %0, %%" dest_reg "\n"::"r"(src_val));
+
+EXPORT_END
 
 #endif // !MY_SYSCALL_H

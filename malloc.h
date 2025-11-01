@@ -1,7 +1,9 @@
 #ifndef MY_MALLOC_H
 #define MY_MALLOC_H
 #include "types.h"
+#include "syscall.h"
 
+EXPORT
 typedef enum {
 	PROT_READ = 0x1,		/* Page can be read.  */
 	PROT_WRITE= 0x2,		/* Page can be written.  */
@@ -19,26 +21,27 @@ typedef enum {
 	MAP_ANONYMOUS = 0x20,		/* Don't use a file.  */
 } MapProps;
 
-extern void *mmap(void *__addr, size_t __len, PageProtection __prot,
-		   MapProps __flags, int __fd, long __offset);
-extern int mprotect(void *__addr, size_t __len, PageProtection __prot);
-extern void munmap(void *ptr, size_t size);
+void *mmap(void *__addr, size_t __len, int __prot,
+		   int __flags, int __fd, long __offset);
+int mprotect(void *__addr, size_t __len, PageProtection __prot);
+void munmap(void *ptr, size_t size);
 
 
-extern void* malloc(size_t size);
-extern void* realloc(void *ptr, size_t size);
-extern void free(void *ptr);
+void* malloc(size_t size);
+void* realloc(void *ptr, size_t size);
+void free(void *ptr);
 
-extern void memcpy(uint8 *dest, const uint8 *src, size_t n);
+void memcpy(uint8 *dest, const uint8 *src, size_t n);
 /*  @brief Use this if you want to create your own heap allocator */
-extern void* heap_new(PageProtection prot, MapProps flags, int fd);
+void* heap_new(PageProtection prot, MapProps flags, int fd);
 /* @brief malloc that can be used with your custom heap */
-extern void* heap_malloc(void *heap, size_t size);
+void* heap_malloc(void *heap, size_t size);
 /* @brief realloc that can be used with your custom heap */
-extern void* heap_realloc(void *heap, void *ptr, size_t size);
+void* heap_realloc(void *heap, void *ptr, size_t size);
 /* @brief free that can be used with your custom heap */
-extern void heap_free(void *heap, void *ptr);
+void heap_free(void *heap, void *ptr);
 /* @brief Destroy the heap */
-extern void heap_destroy(void* heap);
+void heap_destroy(void* heap);
+EXPORT_END
 
 #endif // !MY_MALLOC_H

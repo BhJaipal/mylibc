@@ -2,7 +2,6 @@
 #include "malloc.h"
 #include <types.h>
 
-namespace std {
 class Heap;
 
 template <class T>
@@ -14,6 +13,7 @@ protected:
 	friend class Heap;
 	Heap& heap_;
 	pointer_t(T *data, size_t size): data_(data), size_(size) {}
+	pointer_t(void *data, size_t size): data_((T*)data), size_(size) {}
 public:
 	pointer_t(pointer_t&&) = default;
 	pointer_t(pointer_t&) = default;
@@ -43,11 +43,16 @@ public:
 	void overwrite(T* data) {
 		data_ = data;
 	}
+	void overwrite(const T* data) {
+		data_ = (T*)data;
+	}
 	void free();
+
 	template <class U>
 	operator pointer_t<U>() {
-		return pointer_t<U>(data_, size_);
+		return pointer_t<U>((U*)data_, size_);
 	}
+
 	void realloc(size_t size);
 };
 
@@ -86,4 +91,3 @@ public:
 		free_all_memory();
 	}
 };
-}
