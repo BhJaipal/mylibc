@@ -1,9 +1,0 @@
-CompileFlags:
-  Add:
-    - -nostdinc
-    - -nostdinc++
-    - -I..
-    - -I.
-    - -fpermissive
-    - -Wno-arith-conversion
-    - -Wno-pointer-arith

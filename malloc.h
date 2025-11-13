@@ -3,7 +3,6 @@
 #include "types.h"
 #include "syscall.h"
 
-EXPORT
 typedef enum {
 	PROT_READ = 0x1,		/* Page can be read.  */
 	PROT_WRITE= 0x2,		/* Page can be written.  */
@@ -21,8 +20,8 @@ typedef enum {
 	MAP_ANONYMOUS = 0x20,		/* Don't use a file.  */
 } MapProps;
 
-void *mmap(void *__addr, size_t __len, int __prot,
-		   int __flags, int __fd, long __offset);
+void *mmap (void *addr, size_t len, PageProtection prot,
+		   MapProps flags, int fd, long offset);
 int mprotect(void *__addr, size_t __len, PageProtection __prot);
 void munmap(void *ptr, size_t size);
 
@@ -42,6 +41,6 @@ void* heap_realloc(void *heap, void *ptr, size_t size);
 void heap_free(void *heap, void *ptr);
 /* @brief Destroy the heap */
 void heap_destroy(void* heap);
-EXPORT_END
+
 
 #endif // !MY_MALLOC_H

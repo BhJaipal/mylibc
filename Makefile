@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-FLAGS = -nostdlib -nostdinc -Wno-builtin-declaration-mismatch -g -fPIC -I. -z noexecstack -Llib
+FLAGS = -nodefaultlibs -nostartfiles -nostdinc -Wno-builtin-declaration-mismatch -g -fPIC -I. -fno-stack-protector
 SRC := $(wildcard ./src/*.c)
 START := ./start/asm-impl.s ./start/libc-start.c
 LIB = myc
@@ -14,20 +14,12 @@ endef
 define TO_SRC
 $(basename $(subst build,src,$1)).c
 endef
-define TO_SRCPP
-$(basename $(subst build/cpp,src,$1)).c
-endef
 define TO_OBJ
 $(basename $(subst src,build,$1)).o
 endef
-define TO_OBJPP
-$(basename $(subst src,build/cpp,$1)).o
-endef
 
 b:
-	gcc $(FLAGS) $(call MAIN_FN, $@) -l$(LIB) $(START)
-bpp:
-	g++ $(FLAGS) -Ic++ -fpermissive -Wno-narrowing -fno-rtti ./c++/heap.cpp $(call MAIN_FN, $@) ./c++/new.cpp $(START)pp -l$(LIB)
+	gcc $(FLAGS) $(call MAIN_FN, $@) lib/lib$(LIB).so $(START)
 
 .ONESHELL:
 run:
@@ -40,18 +32,18 @@ examples/%.c:
 build/%.o: src/%.c
 	$(CC) $(FLAGS) -o $@ -c $(call TO_SRC, $@)
 
-build/cpp/%.o: src/%.c
-	if [[ ! -d build/cpp ]]; then mkdir -p build/cpp; fi
-	g++ -fpermissive -Wno-narrowing $(FLAGS) -o $@ -c $(call TO_SRCPP, $@)
-
 OBJ := $(foreach src, $(SRC), $(call TO_OBJ, $(src)))
-OBJPP := $(foreach src, $(SRC), $(call TO_OBJPP, $(src)))
 
 .ONESHELL:
 test-all:
 	failed=;
 	for item in $(TESTS); do
-		make test TEST=$$item;
+		gcc $(FLAGS) test.c tests/$$item.c lib/lib$(LIB).so $(START) -o $$item-test.exe
+	done;
+	clear;
+	for item in $(TESTS); do
+		./$$item-test.exe
+		echo ""
 		if [[ $$? == 2 ]]; then failed=1; fi;
 	done;
 	
@@ -61,8 +53,8 @@ test-all:
 
 .ONESHELL:
 test:
-	gcc $(FLAGS) test.c tests/$(TEST).c $(LIB) $(START) -o $(TEST)-test.exe
-	./$(TEST)-test.exe $(TEST)
+	gcc $(FLAGS) test.c tests/$(TEST).c lib/lib$(LIB).so $(START) -o $(TEST)-test.exe
+	./$(TEST)-test.exe
 
 .ONESHELL:
 compile:
@@ -72,10 +64,6 @@ compile:
 shared: $(OBJ)
 	$(CC) $(FLAGS) $(OBJ) -shared -o lib/lib$(LIB).so
 	echo -e "\e[92mBuilt done lib$(LIB).so successfully\e[0m"
-
-sharedpp: $(OBJPP)
-	g++ $(FLAGS) $(OBJPP) -shared -o lib/lib$(LIBXX).so
-	echo -e "\e[92mBuilt done lib$(LIBXX).so successfully\e[0m"
 
 clean:
 	rm a.out

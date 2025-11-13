@@ -17,14 +17,18 @@ typedef struct {
 	int fd;
 } Heap;
 
-TEST({
+TEST(custom_heap)
 	void *heap = heap_new(PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1);
 	char *name = heap_malloc(heap, 5);
 	strcpy(name, "Hema");
 	name = heap_realloc(heap, name, 9);
 	strcat(name, " bha");
 
-	EXPECT(((Heap*)heap)->head->ptr == name, "Memory Failed to reallocate");
+	EXPECT(((Heap*)heap)->head->ptr == name);
 	heap_free(heap, name);
 	heap_destroy(heap);
-})
+	EXPECT(0);
+	return 0;
+}
+
+ENABLE(custom_heap_test);

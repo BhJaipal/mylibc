@@ -1,9 +1,10 @@
 #include "test.h"
-#include "malloc.h"
 #include "string.h"
 
-TEST({
+TEST(malloc)
 	char *name = malloc(sizeof(char[5]));
-	EXPECT(name, "Expected heap pointer, got nullptr instead");
+	EXPECT(name);
 	strncpy(name, "Jai\n", 5);
-})
+	return 0;
+}
+ENABLE(malloc_test)

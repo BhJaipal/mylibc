@@ -10,8 +10,6 @@
 #define EXPORT_END
 #endif
 
-EXPORT
-
 #define SYSCALL(ret, rax, ...) \
 	size_t argv[] = {__VA_ARGS__, 0, 0, 0, 0, 0};\
 	ret syscall(rax, argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
@@ -60,6 +58,5 @@ extern int lseek(uint64 fd, int64 offset, uint32 whence);
 #define MOV(dest_reg, src_val) \
 	asm("mov %0, %%" dest_reg "\n"::"r"(src_val));
 
-EXPORT_END
 
 #endif // !MY_SYSCALL_H
