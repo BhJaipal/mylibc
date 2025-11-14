@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-FLAGS = -nodefaultlibs -nostartfiles -nostdinc -Wno-builtin-declaration-mismatch -g -fPIC -I. -fno-stack-protector
+FLAGS = -nodefaultlibs -nostartfiles -nostdinc -Wno-builtin-declaration-mismatch -g -fPIC -I. -fno-stack-protector -z noexecstack
 SRC := $(wildcard ./src/*.c)
 START := ./start/asm-impl.s ./start/libc-start.c
 LIB = myc
@@ -37,18 +37,13 @@ OBJ := $(foreach src, $(SRC), $(call TO_OBJ, $(src)))
 .ONESHELL:
 test-all:
 	failed=;
-	for item in $(TESTS); do
-		gcc $(FLAGS) test.c tests/$$item.c lib/lib$(LIB).so $(START) -o $$item-test.exe
-	done;
-	clear;
+	for item in $(TESTS); do gcc $(FLAGS) test.c tests/$$item.c lib/lib$(LIB).so $(START) -o $$item-test.exe; done;
 	for item in $(TESTS); do
 		./$$item-test.exe
-		echo ""
-		if [[ $$? == 2 ]]; then failed=1; fi;
+		if [[ $$? == 1 ]]; then failed=1; fi;
 	done;
-	
-	if [[ $$failed ]]; then
-		echo -e "\e[91mTest failed\e[0m";
+	if [[ $$failed == 1 ]]; then echo -e "\e[91mSome Test Failed\e[0m";
+	else echo -e "\e[92mAll Test Passed\e[0m";
 	fi
 
 .ONESHELL:

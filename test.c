@@ -8,10 +8,14 @@ void enable();
 
 int main(int argc, char *argv[]) {
 	enable();
+	int status = 0;
 	for (size_t i = 0; i < test_count; i++) {
 		if (!tests[i](argc, argv)) {
 			printf("\e[92m[%s] passed\n\e[0m", test_name);
-		} else
+		} else {
 			printf("\e[91m[%s] failed\n\e[0m", test_name);
+			status = 1;
+		}
 	}
+	return status;
 }

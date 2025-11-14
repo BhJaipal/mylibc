@@ -33,16 +33,18 @@ void arena_create(MemoryArena *arena);
 void arena_heap_as_default(MemoryArena *arena);
 
 /** sets arena.auto_defrag as you wish, default is true, auto defragmentation is done after each memory free */
-inline void set_auto_defrag(MemoryArena *arena, char auto_defrag);
+inline void set_auto_defrag(MemoryArena *arena, char auto_defrag) {
+	arena->auto_defrag = auto_defrag;
+}
 
 /** @brief allocate memory in arena */
 void *arena_alloc(MemoryArena *arena, size_t size);
 
-/** WARN: Not implemented yet */
 void arena_dealloc(MemoryArena *arena, void *ptr);
 
 /** WARN: Not implemented yet */
 void arena_defrag(MemoryArena *arena);
+void arena_auto_defrag(MemoryArena *arena);
 
 void arena_destroy(MemoryArena *arena);
 

@@ -26,6 +26,7 @@ extern char test_name[20];
 		int next = 0;\
 		println("Testing " #name);
 
+#define ENDTEST return 0; }
 
 #define STR(n) #n
 

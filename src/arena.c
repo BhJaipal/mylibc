@@ -43,11 +43,11 @@ void *arena_alloc(MemoryArena *arena, size_t size) {
 		}
 		curr = curr->next;
 	}
-	if (!curr->next) {
+	if (!curr->next && (curr->size < size || curr->in_use)) {
 		curr->next = mmap(null, sizeof(struct _pointer_t), PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
 		pointer_defaults_on(curr->next);
 		curr->next->size = size;
-		curr->next->ptr = mmap(null, size, arena->prot, arena->flags, arena->fd, 0);
+		curr->next->ptr = mmap(curr->ptr + curr->size, size, arena->prot, arena->flags, arena->fd, 0);
 		curr->next->prev = curr;
 		arena->inuse_sz += size;
 		arena->total_sz += size;
@@ -69,10 +69,6 @@ void *arena_alloc(MemoryArena *arena, size_t size) {
 	return curr->ptr;
 }
 
-void set_auto_defrag(MemoryArena *arena, char auto_defrag) {
-	arena->auto_defrag = auto_defrag;
-}
-
 
 void arena_destroy(MemoryArena *arena) {
 	munmap(arena->head->ptr, arena->total_sz);
@@ -89,3 +85,37 @@ void arena_destroy(MemoryArena *arena) {
 	arena->inuse_sz = 0;
 	arena->total_sz = 0;
 }
+
+void arena_dealloc(MemoryArena *arena, void *ptr) {
+	pointer_t curr = arena->head;
+	if (!curr) return;
+
+	while (curr->next && curr->ptr != ptr) {
+		curr = curr->next;
+	}
+	if (curr->ptr != ptr) return;
+	curr->in_use = false;
+
+	arena->inuse_sz -= curr->size;
+
+	if (arena->auto_defrag) arena_auto_defrag(arena);
+}
+
+void arena_auto_defrag(MemoryArena *arena) {
+	pointer_t curr = arena->head;
+	if (!curr) return;
+
+	while (curr->next) {
+		while (!curr->in_use && !curr->next->in_use) {
+			if (!curr->next) break;
+			curr->size += curr->next->size;
+			pointer_t new_nx = curr->next->next;
+			munmap(curr->next, sizeof(struct _pointer_t));
+			curr->next = new_nx;
+			if (!new_nx) break;
+			new_nx->prev = curr;
+		}
+		curr = curr->next;
+	}
+}
+void arena_defrag(MemoryArena *arena) {}

@@ -27,8 +27,6 @@ TEST(custom_heap)
 	EXPECT(((Heap*)heap)->head->ptr == name);
 	heap_free(heap, name);
 	heap_destroy(heap);
-	EXPECT(0);
-	return 0;
-}
+ENDTEST
 
 ENABLE(custom_heap_test);
