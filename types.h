@@ -9,6 +9,8 @@ INT_TYPE(char, 8);
 INT_TYPE(short, 16);
 INT_TYPE(int, 32);
 INT_TYPE(long, 64);
+#define true 1
+#define false 0
 
 typedef unsigned long size_t;
 
