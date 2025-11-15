@@ -42,7 +42,6 @@ int poll(struct pollfd *ufds, uint64 __nfds, int __timeout) {
 int lseek(uint64 fd, int64 offset, uint32 whence) {
 	SYSCALL(return, SYS_lseek, fd, offset, whence);
 }
-
 int vfork() {
 	SYSCALL(return, SYS_vfork, 0);
 }

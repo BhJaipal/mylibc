@@ -54,7 +54,7 @@ char* u64to_str(uint64 x, uint8 size, char *out) {
 
 char* ptr_to_str(void *ptr, char *out) {
 	size_t x = (size_t)ptr;
-	strcat(out, "0x");
+	strcpy(out, "0x");
 	size_t out_len = 2;
 	if (x < 16) {
 		out[0] = x + 0x30;

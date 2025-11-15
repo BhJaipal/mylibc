@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-FLAGS = -nodefaultlibs -nostartfiles -nostdinc -Wno-builtin-declaration-mismatch -g -fPIC -I. -fno-stack-protector -z noexecstack
+FLAGS = -nostartfiles -nostdinc -g -fPIC -I. -z noexecstack -ffreestanding
 SRC := $(wildcard ./src/*.c)
 START := ./start/asm-impl.s ./start/libc-start.c
 LIB = myc

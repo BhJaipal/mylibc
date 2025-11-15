@@ -3,10 +3,14 @@
 #include "malloc.h"
 #include "types.h"
 
+#define MEMORYARENA_MAX_NODES 20
+
+typedef struct _pointer_t _pointer_t;
 typedef struct _pointer_t {
 	void *ptr;
 	size_t size;
-	char in_use;
+	/* enable|in_use */
+	char flags;
 	struct _pointer_t *prev, *next;
 } *pointer_t;
 
@@ -15,7 +19,7 @@ typedef struct _MemoryArena {
 	MapProps flags;
 	PageProtection prot;
 	/* these are set automatic */
-	pointer_t head;
+	_pointer_t head[MEMORYARENA_MAX_NODES];
 	size_t inuse_sz, total_sz;
 	char auto_defrag;
 } MemoryArena;

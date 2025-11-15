@@ -20,6 +20,24 @@ extern char test_name[20];
 		println("\t\e[92m[" #condition "]\e[0m: passed");\
 	next++;
 
+
+#define IS_NULL(value) \
+	if (!(value == null || (size_t)value == (size_t)-1)) {\
+		println("\t\e[91m[" #value ".is_null()]\e[0m: failed");\
+		return 1;						\
+	} else\
+		println("\t\e[92m[" #value ".is_null()]\e[0m: passed");\
+	next++;
+
+
+#define IS_NOT_NULL(value) \
+	if (value == null || (size_t)value == (size_t)-1) {\
+		println("\t\e[91m[" #value ".is_not_null()]\e[0m: failed");\
+		return 1;						\
+	} else\
+		println("\t\e[92m[" #value ".is_not_null()]\e[0m: passed");\
+	next++;
+
 #define TEST(name) \
 	int name##_test(int argc, char **argv) {\
 		strcpy(test_name, #name);\

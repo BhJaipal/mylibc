@@ -4,14 +4,16 @@
 
 void arena_init(MemoryArena *arena) {
 	arena->auto_defrag = true;
-	arena->head = null;
+	for (size_t i = 0; i < MEMORYARENA_MAX_NODES; i++) {
+		arena->head[i].flags = 0;
+	}
 	arena->inuse_sz = 0;
 	arena->total_sz = 0;
 }
 void pointer_defaults_on(pointer_t ptr) {
 	ptr->prev = null;
 	ptr->next = null;
-	ptr->in_use = 1;
+	ptr->flags = 3;
 	ptr->ptr = null;
 	ptr->size = 0;
 }
@@ -26,8 +28,7 @@ void arena_heap_as_default(MemoryArena *arena) {
 	arena->flags = MAP_ANONYMOUS|MAP_PRIVATE;
 }
 void *arena_alloc(MemoryArena *arena, size_t size) {
-	if (!arena->head) {
-		arena->head = mmap(null, sizeof(struct _pointer_t), PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
+	if (arena->head->flags < 3) {
 		pointer_defaults_on(arena->head);
 		arena->head->size = size;
 		arena->head->ptr = mmap(null, size, arena->prot, arena->flags, arena->fd, 0);
@@ -37,14 +38,21 @@ void *arena_alloc(MemoryArena *arena, size_t size) {
 	}
 
 	pointer_t curr = arena->head;
+	size_t i = 0;
 	while (curr->next) {
-		if (!(curr->size < size || curr->in_use)) {
+		if (!(curr->size < size || (curr->flags & 1))) {
 			break;
 		}
 		curr = curr->next;
+		i++;
 	}
-	if (!curr->next && (curr->size < size || curr->in_use)) {
-		curr->next = mmap(null, sizeof(struct _pointer_t), PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
+	if (!curr->next && (curr->size < size || (curr->flags & 1))) {
+		for (unsigned i = 0; i < MEMORYARENA_MAX_NODES; i++) {
+			if (!arena->head[i].flags) {
+				curr->next = arena->head + i;
+				break;
+			}
+		}
 		pointer_defaults_on(curr->next);
 		curr->next->size = size;
 		curr->next->ptr = mmap(curr->ptr + curr->size, size, arena->prot, arena->flags, arena->fd, 0);
@@ -54,17 +62,19 @@ void *arena_alloc(MemoryArena *arena, size_t size) {
 		return curr->next->ptr;
 	}
 	pointer_t next = curr->next;
+	pointer_t new = arena->head + i;
 	if (curr->size - size) {
-		pointer_t new = mmap(null, sizeof(struct _pointer_t), PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
 		pointer_defaults_on(new);
-		new->in_use = false;
+		new->flags = 2;
 		new->size = curr->size - size;
 
 		new->next = next;
 		next->prev = new;
 		curr->next = new;
+	} else {
+		new->flags = false;
 	}
-	curr->in_use = true;
+	curr->flags = 3;
 	curr->size -= size;
 	return curr->ptr;
 }
@@ -81,7 +91,11 @@ void arena_destroy(MemoryArena *arena) {
 	}
 	munmap(curr, sizeof(struct _pointer_t));
 
-	arena->head = null;
+	for (size_t i = 0; i < MEMORYARENA_MAX_NODES; i++) {
+		arena->head[i].flags = 0;
+		arena->head[i].size = 0;
+		arena->head[i].ptr = 0;
+	}
 	arena->inuse_sz = 0;
 	arena->total_sz = 0;
 }
@@ -94,7 +108,7 @@ void arena_dealloc(MemoryArena *arena, void *ptr) {
 		curr = curr->next;
 	}
 	if (curr->ptr != ptr) return;
-	curr->in_use = false;
+	curr->flags = 2;
 
 	arena->inuse_sz -= curr->size;
 
@@ -106,7 +120,7 @@ void arena_auto_defrag(MemoryArena *arena) {
 	if (!curr) return;
 
 	while (curr->next) {
-		while (!curr->in_use && !curr->next->in_use) {
+		while (!(curr->flags & 1) && !(curr->next->flags & 1)) {
 			if (!curr->next) break;
 			curr->size += curr->next->size;
 			pointer_t new_nx = curr->next->next;
