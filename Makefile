@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-FLAGS = -nostartfiles -nostdinc -g -fPIC -I. -z noexecstack -ffreestanding
+FLAGS = -nostartfiles -nostdinc -g -fPIC -Iinclude -z noexecstack -ffreestanding
 SRC := $(wildcard ./src/*.c)
 START := ./start/asm-impl.s ./start/libc-start.c
 LIB = myc
@@ -21,9 +21,11 @@ endef
 b:
 	gcc $(FLAGS) $(call MAIN_FN, $@) lib/lib$(LIB).so $(START)
 
+ba:
+	gcc $(FLAGS) $(call MAIN_FN, $@) -static lib/lib$(LIB).a $(START)
+
 .ONESHELL:
 run:
-	export LD_LIBRARY_PATH=./lib
 	./a.out
 
 examples/%.c:
@@ -37,9 +39,12 @@ OBJ := $(foreach src, $(SRC), $(call TO_OBJ, $(src)))
 .ONESHELL:
 test-all:
 	failed=;
-	for item in $(TESTS); do gcc $(FLAGS) test.c tests/$$item.c lib/lib$(LIB).so $(START) -o $$item-test.exe; done;
 	for item in $(TESTS); do
-		./$$item-test.exe
+		gcc $(FLAGS) test.c tests/$$item.c lib/lib$(LIB).so $(START) -o $$item-test.exe;
+		if [[ $$? == 1 ]]; then failed=1; fi;
+	done;
+	for item in $(TESTS); do
+		./$$item-test.exe;
 		if [[ $$? == 1 ]]; then failed=1; fi;
 	done;
 	if [[ $$failed == 1 ]]; then echo -e "\e[91mSome Test Failed\e[0m";
@@ -59,6 +64,11 @@ compile:
 shared: $(OBJ)
 	$(CC) $(FLAGS) $(OBJ) -shared -o lib/lib$(LIB).so
 	echo -e "\e[92mBuilt done lib$(LIB).so successfully\e[0m"
+
+
+ar: $(OBJ)
+	ar rcs lib/lib$(LIB).a $(OBJ)
+	echo -e "\e[92mBuilt done lib$(LIB).a successfully\e[0m"
 
 clean:
 	rm a.out

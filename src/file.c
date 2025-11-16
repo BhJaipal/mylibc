@@ -7,11 +7,11 @@
 
 #define ST (size_t)
 
-void read(int fd, char *msg, int len) {
-	SYSCALL(, SYS_read, fd, ST msg, len);
+int read(int fd, char *msg, int len) {
+	SYSCALL(return , SYS_read, fd, ST msg, len);
 }
-void write(int fd, const char *msg, int len) {
-	SYSCALL(, SYS_write, fd, ST msg, len);
+int write(int fd, const char *msg, int len) {
+	SYSCALL(return , SYS_write, fd, ST msg, len);
 }
 int pread(unsigned int fd, char *buf, size_t count, size_t pos) {
 	SYSCALL(return, SYS_pread64, fd, ST buf, count, pos);

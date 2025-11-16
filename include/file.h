@@ -33,8 +33,8 @@ typedef enum {
 } FileOpenFlags;
 
 
-void read(int fd, char *msg, int len);
-void write(int fd, const char *msg, int len);
+int read(int fd, char *msg, int len);
+int write(int fd, const char *msg, int len);
 int open(const char *path, FileOpenFlags flags, ...);
 void close(int fd);
 int pread(unsigned int fd, char *buf, size_t count, size_t pos);
