@@ -14,6 +14,13 @@ INT_TYPE(long, 64);
 
 typedef unsigned long size_t;
 
+typedef int pid_t;
+typedef int64 time_t;
+typedef int64 suseconds_t;
+struct timeval {
+	time_t tv_sec;
+	suseconds_t tv_usec;
+};
 struct timespec {
   long tv_sec;		/* Seconds.  */
   long tv_nsec;	/* Nanoseconds.  */

@@ -1,7 +1,7 @@
 SHELL = /bin/bash
 FLAGS = -nostartfiles -nostdinc -g -fPIC -Iinclude -z noexecstack -ffreestanding
 SRC := $(wildcard ./src/*.c)
-START := ./start/asm-impl.s ./start/libc-start.c
+START := ./start/libc-start.c
 LIB = myc
 CC ?= gcc
 
@@ -18,18 +18,27 @@ define TO_OBJ
 $(basename $(subst src,build,$1)).o
 endef
 
-b:
-	gcc $(FLAGS) $(call MAIN_FN, $@) lib/lib$(LIB).so $(START)
-
-ba:
-	gcc $(FLAGS) $(call MAIN_FN, $@) -static lib/lib$(LIB).a $(START)
+.PHONY: bin/% bin-src/%.c examples/%.c
+bin/%:
+	gcc $(FLAGS) $(subst bin,bin-src,$@).c lib/lib$(LIB).so $(START) -o $@
 
 .ONESHELL:
+bins:
+	for item in $(wildcard ./bin-src/*.c); do
+		make -B $$item
+	done
+
+bin-src/%:
+	gcc $(FLAGS) $@ lib/lib$(LIB).so $(START) -o $(subst .c,, $(subst -src,,$@))
+
 run:
-	./a.out
+	gcc $(FLAGS) $(call MAIN_FN, $@) lib/lib$(LIB).so $(START)
+
+runpp:
+	gcc $(FLAGS) $(call MAIN_FN, $@) -static lib/lib$(LIB).a $(START)
 
 examples/%.c:
-	$(CC) $(FLAGS) $@ $(LIB) $(START)
+	$(CC) $(FLAGS) $@ lib/lib$(LIB).so $(START)
 
 build/%.o: src/%.c
 	$(CC) $(FLAGS) -o $@ -c $(call TO_SRC, $@)

@@ -1,8 +1,0 @@
-	.text
-	.globl _start
-	.type _start, @function
-
-_start:
-	pop %rdi
-	mov %rsp, %rsi
-	call _libc_main

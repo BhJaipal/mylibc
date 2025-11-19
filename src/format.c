@@ -50,7 +50,10 @@ char* format_args(const char *str, va_list args) {
 				dest_len++;
 			} else if (str[i] == 's') {
 				const char *out = va_arg(args, const char*);
-				strcat(dest, out);
+				if (out == 0) {
+					strcat(dest, "nil");
+				} else
+					strcat(dest, out);
 				dest_len += strlen(out);
 			} else if (str[i] == 'p') {
 				char out[11] = "";
@@ -160,7 +163,10 @@ char* formatn_args(const char *str, size_t n, va_list args) {
 				dest_len++;
 			} else if (str[i] == 's') {
 				const char *out = va_arg(args, const char*);
-				strcat(dest, out);
+				if (out == 0) {
+					strcat(dest, "nil");
+				} else
+					strcat(dest, out);
 				dest_len += strlen(out);
 			} else if (str[i] == 'h') {
 				short_t++;
