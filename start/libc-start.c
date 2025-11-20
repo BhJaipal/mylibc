@@ -1,7 +1,10 @@
+#include <malloc.h>
+#include <unistd.h>
+
 extern void* heap_init();
 extern void set_global_heap(void *_heap);
 extern void global_heap_destroy();
-extern int main(int argc, char **argv);
+extern int main(int argc, char **argv, char **envp);
 extern void libc_main(long argc, char **argv);
 extern void exit(int) __attribute__((noreturn));
 
@@ -15,9 +18,12 @@ void _start() {
 	);
 }
 
+
 void libc_main(long argc, char **argv) {
+	char **envp = argv + argc + 1;
+	environ = envp;
 	set_global_heap(heap_init());
-	int status = main(argc, argv);
+	int status = main(argc, argv, envp);
 	global_heap_destroy();
 	exit(status);
 }

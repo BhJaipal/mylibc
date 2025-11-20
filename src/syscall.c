@@ -3,31 +3,21 @@
 #include <net/socket.h>
 #define ST (size_t)
 
-size_t syscall(long rax, long rdi, long rsi, long rdx, long r10, long r8, long r9) {
-	asm("mov %0, %%"RDI"\n"::"r"(rdi));
-	asm("mov %0, %%"RSI"\n"::"r"(rsi));
-	asm("mov %0, %%"RDX"\n"::"r"(rdx));
+size_t syscall(long rdi, long rsi, long rdx, long r10, long r8, long r9, long rax) {
 	asm("mov %0, %%"R10"\n"::"r"(r10));
-	asm("mov %0, %%"R8"\n"::"r"(r8));
-	asm("mov %0, %%"R9"\n"::"r"(r9));
 
-	size_t out;
 	asm("mov %0, %%"RAX"\n"::"r"(rax));
 	SYSCALL_EXEC;
+	size_t out;
 	asm("mov %%"RAX", %0\n":"=r"(out));
 	return out;
 }
-size_t syscall_ptr(long rax, const void *rdi, const void *rsi, const void *rdx, const void *r10, const void *r8, const void *r9) {
-	asm("mov %0, %%"RDI"\n"::"r"(rdi));
-	asm("mov %0, %%"RSI"\n"::"r"(rsi));
-	asm("mov %0, %%"RDX"\n"::"r"(rdx));
+size_t syscall_ptr(const void *rdi, const void *rsi, const void *rdx, const void *r10, const void *r8, const void *r9, long rax) {
 	asm("mov %0, %%"R10"\n"::"r"(r10));
-	asm("mov %0, %%"R8"\n"::"r"(r8));
-	asm("mov %0, %%"R9"\n"::"r"(r9));
 
-	size_t out;
 	asm("mov %0, %%"RAX"\n"::"r"(rax));
 	SYSCALL_EXEC;
+	size_t out;
 	asm("mov %%"RAX", %0\n":"=r"(out));
 	return out;
 }
@@ -77,6 +67,6 @@ int accept(int sockfd, const SocketAddr *addr, socklen_t *len) {
 	SYSCALL(return, SYS_accept, sockfd, (size_t) addr, (size_t) len);
 }
 int execve(const char *filename, const char *const *argv, const char *const *envp) {
-	return syscall_ptr(SYS_execve, filename, argv, envp, 0, 0, 0);
+	return syscall_ptr(filename, argv, envp, 0, 0, 0, SYS_execve);
 }
 

@@ -12,7 +12,7 @@
 
 #define SYSCALL(ret, rax, ...) \
 	size_t argv[] = {__VA_ARGS__, 0, 0, 0, 0, 0};\
-	ret syscall(rax, argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
+	ret syscall(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], rax);
 
 size_t syscall(long rax, long rdi, long rsi, long rdx, long r10, long r8, long r9);
 
@@ -43,6 +43,7 @@ extern int lseek(uint64 fd, int64 offset, uint32 whence);
 #define R10 "r10"
 #define R8   "r8"
 #define R9   "r9"
+#define R11  "r11"
 #define SYSCALL_EXEC asm("syscall\n");
 #else
 #define RAX "eax"
@@ -52,6 +53,7 @@ extern int lseek(uint64 fd, int64 offset, uint32 whence);
 #define R10 "esi"
 #define R8  "edi"
 #define R9  "ebp"
+#define R11  "r11d"
 #define SYSCALL_EXEC asm("\nint 0x80\n");
 #endif
 
