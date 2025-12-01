@@ -1,4 +1,5 @@
-#include "syscall.h"
+#include <syscall.h>
+#include <sys/poll.h>
 #include "syscall_enum.h"
 #include <net/socket.h>
 #define ST (size_t)

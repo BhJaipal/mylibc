@@ -73,4 +73,6 @@
 #define INTMAX_C(c)  c ## L
 #define UINTMAX_C(c) c ## UL
 
+#define PATH_MAX 4096
+
 #endif // !STDINT_H

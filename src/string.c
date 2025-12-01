@@ -1,5 +1,7 @@
+#include "types.h"
 #include <c-impl.h>
 #include <stdint.h>
+#include <malloc.h>
 #include <string.h>
 
 char toupper(char ch) {
@@ -119,4 +121,10 @@ char *strchrnul(const char *s, int c) {
 #endif
 	for (; *s && *(unsigned char *)s != c; s++);
 	return (char *)s;
+}
+char *strdup(const char *s) {
+	size_t l = strlen(s);
+	char *d = malloc(l+1);
+	if (!d) return null;
+	return memcpy((uint8*)d, (uint8*)s, l+1);
 }

@@ -4,25 +4,6 @@
 #include <malloc.h>
 #include <stdarg.h>
 
-size_t get_value(int loc) {
-	size_t out;
-	if (loc == 0) {
-		asm("mov %%rax, %0":"=r"(out));
-	} else if (loc == 1) {
-		asm("mov %%rdi, %0":"=r"(out));
-	} else if (loc == 2) {
-		asm("mov %%rsi, %0":"=r"(out));
-	} else if (loc == 3) {
-		asm("mov %%rdx, %0":"=r"(out));
-	} else if (loc == 4) {
-		asm("mov %%rcx, %0":"=r"(out));
-	} else if (loc == 5) {
-		asm("mov %%r8, %0":"=r"(out));
-	} else if (loc == 6) {
-		asm("mov %%r9, %0":"=r"(out));
-	}
-	return out;
-}
 char* format_args(const char *str, va_list args) {
 	size_t loc = 0;
 	size_t str_len = strlen(str);

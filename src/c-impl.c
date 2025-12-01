@@ -1,6 +1,7 @@
 #include "c-impl.h"
 #include "file.h"
 #include "types.h"
+#include <unistd.h>
 #include <syscall.h>
 #include "string.h"
 

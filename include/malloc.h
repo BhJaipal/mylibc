@@ -8,7 +8,7 @@ void* malloc(size_t size);
 void* realloc(void *ptr, size_t size);
 void free(void *ptr);
 
-void memcpy(uint8 *dest, const uint8 *src, size_t n);
+void* memcpy(uint8 *dest, const uint8 *src, size_t n);
 /*  @brief Use this if you want to create your own heap allocator */
 void* heap_new(PageProtection prot, MapProps flags, int fd);
 /* @brief malloc that can be used with your custom heap */

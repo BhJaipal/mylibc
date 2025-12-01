@@ -1,4 +1,4 @@
-#include "stat.h"
+#include <sys/stat.h>
 #include "syscall_enum.h"
 #include "syscall.h"
 #define ST (size_t)

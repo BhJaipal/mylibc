@@ -1,0 +1,5 @@
+CompileFlags:
+  Add:
+    - -nostdinc
+    - -I../../include
+    - -I../../include/c++

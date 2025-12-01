@@ -4,6 +4,11 @@ SRC := $(wildcard ./src/*.c)
 START := ./start/libc-start.c
 LIB = myc
 CC ?= gcc
+CXX := $(wildcard ./src/c++/*.cpp)
+CXXFLAGS = -Iinclude/c++
+
+SRCCXX := $(wildcard ./src/c++/*.cpp)
+SRCCXX_C := ./src/format.c ./src/c-impl.c ./src/env.c ./src/in.c ./src/stat.c ./src/file.c ./src/unistd.c ./src/string.c ./src/io.c
 
 TESTS := $(foreach test,$(wildcard tests/*.c), $(subst .c,,$(subst tests/,,$(test))))
 
@@ -31,10 +36,16 @@ bins:
 bin-src/%:
 	gcc $(FLAGS) $@ lib/lib$(LIB).so $(START) -o $(subst .c,, $(subst -src,,$@))
 
+runpp:
+	g++ $(FLAGS) $(call MAIN_FN, $@) lib/lib$(LIB).so $(CXXFLAGS) $(CXX) $(START)pp
+
+runpp-static:
+	g++ $(FLAGS) $(call MAIN_FN, $@) -static lib/lib$(LIB).a $(CXXFLAGS) $(CXX) $(START)pp
+
 run:
 	gcc $(FLAGS) $(call MAIN_FN, $@) lib/lib$(LIB).so $(START)
 
-runpp:
+run-static:
 	gcc $(FLAGS) $(call MAIN_FN, $@) -static lib/lib$(LIB).a $(START)
 
 examples/%.c:
@@ -42,6 +53,12 @@ examples/%.c:
 
 build/%.o: src/%.c
 	$(CC) $(FLAGS) -o $@ -c $(call TO_SRC, $@)
+
+build/c++/%.o: src/c++/%.cpp
+	g++ $(FLAGS) $(CXXFLAGS) $(subst build,src,$(basename $@)).cpp -c -o $@
+
+buildcxx:
+	$(foreach src, $(SRCCXX), make $(subst src,build,$(basename $(src))).o;)
 
 OBJ := $(foreach src, $(SRC), $(call TO_OBJ, $(src)))
 

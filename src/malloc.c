@@ -122,10 +122,11 @@ void heap_update(Heap *heap, HeapEvent event, void *ptr, size_t len) {
 	}
 }
 
-void memcpy(uint8 *dest, const uint8 *src, size_t n) {
+void* memcpy(uint8 *dest, const uint8 *src, size_t n) {
 	for (size_t i = 0; i < n; i++) {
 		dest[i] = src[i];
 	}
+	return dest;
 }
 
 void* heap_new(PageProtection prot, MapProps flags, int fd) {

@@ -16,25 +16,6 @@
 
 size_t syscall(long rax, long rdi, long rsi, long rdx, long r10, long r8, long r9);
 
-void exit(int status);
-int kill(int pid, int sig);
-int getpid();
-int pause();
-int alarm(uint32 seconds);
-int vfork();
-int fork();
-int execve(const char *filename, const char *const *argv, const char *const *envp);
-
-/* Data structure describing a polling request.  */
-struct pollfd {
-    int fd;			/* File descriptor to poll.  */
-    int16 events;		/* Types of events poller cares about.  */
-	int16 revents;		/* Types of events that actually occurred.  */
-};
-
-extern int poll(struct pollfd *ufds, uint64 __nfds, int __timeout);
-extern int lseek(uint64 fd, int64 offset, uint32 whence);
-
 #if defined __x86_64 || defined __x86_64__
 #define RAX "rax"
 #define RDI "rdi"
