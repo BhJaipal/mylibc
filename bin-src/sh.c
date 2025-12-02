@@ -1,9 +1,9 @@
-#include "malloc.h"
 #include <sys/wait.h>
+#include <sys/mman.h>
+#include <unistd.h>
 #include <string.h>
-#include <syscall.h>
 #include <file.h>
-#include <syscall_enum.h>
+#include <io.h>
 
 int main(int argc, char *argv[]) {
 	if (argc < 2) {
@@ -20,8 +20,8 @@ int main(int argc, char *argv[]) {
 				argv_[i] = mmap(0, 30, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
 			}
 
-			int len = 5;
-			strcat(argv_[0], "/bin/");
+			int len = 4;
+			strcat(argv_[0], "bin/");
 			int i = 0;
 			while (buff[i]) {
 				if (buff[i] == ' ') {
@@ -47,17 +47,19 @@ int main(int argc, char *argv[]) {
 				return *argv_[1] - 0x30;
 			}
 
+			int out = 0;
 			int id = fork();
 			if (id == 0) {
-				int out = execve(argv_[0], (const char *const*)argv_, 0);
+				out = execve(argv_[0], (const char *const*)argv_, 0);
 				if (out == -2) {
 					printf("command not found %s\n", argv_[0]);
 					printf("\e[91m[EXIT: 127]\e[0m\n");
 					exit(127);
 				}
-				printf("\e[91m[EXIT: %i]\e[0m\n", out);
 				exit(out);
 			} else {
+				if (out != 0)
+					printf("\e[91m[EXIT: %i]\e[0m\n", out);
 				wait(&status);
 			}
 		}

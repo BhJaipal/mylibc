@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-FLAGS = -nostartfiles -nostdinc -g -fPIC -Iinclude -z noexecstack -ffreestanding
+FLAGS = -nostartfiles -nostdinc -g -fPIC -Iinclude -z noexecstack -ffreestanding -Wno-implicit-function-declaration
 SRC := $(wildcard ./src/*.c)
 START := ./start/libc-start.c
 LIB = myc
