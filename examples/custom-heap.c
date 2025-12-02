@@ -2,7 +2,7 @@
 #include "c-impl.h"
 #include "string.h"
 
-int main() {
+int main(int c, char **v, char**e) {
 	char *name = malloc(5);
 	strcpy(name, "Jai");
 	print(name);

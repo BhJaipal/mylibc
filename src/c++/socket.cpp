@@ -15,23 +15,23 @@ namespace std {
 		addr.sin_family = PF_INET;
 		addr.sin_port = htons(port);
 		addr.sin_addr.s_addr = htonl(INADDR_ANY);
-		return sys::syscall(fd, (libc::size_t)&addr, sizeof(addr), SYS_bind);
+		return sys::syscall(SYS_bind, fd, (libc::size_t)&addr, sizeof(addr));
 	}
 
 	Socket::Socket(ProtocolFamily domain, SocketType type, ProtocolFamily protocol) {
-		fd = sys::syscall(domain, type, protocol, SYS_socket);
+		fd = sys::syscall(SYS_socket, domain, type, protocol);
 		if (fd == -1) {
 			stdout().write("Failed to connect socket\n");
-			sys::syscall(1, SYS_exit);
+			sys::syscall(SYS_exit, 1);
 		}
 	}
 	int Socket::listen(libc::size_t backlog) {
-		return sys::syscall(fd, backlog, SYS_listen);
+		return sys::syscall(SYS_listen, fd, backlog);
 	}
 	Socket Socket::accept() {
 		libc::net::SocketAddrIn client_Addr;
 		socklen_t client_len = sizeof(client_Addr);
-		int client = sys::syscall(fd, (libc::size_t)&client_Addr, (libc::size_t)&client_len, SYS_accept);
+		int client = sys::syscall(SYS_accept, fd, (libc::size_t)&client_Addr, (libc::size_t)&client_len);
 		return Socket(client);
 	}
 	}

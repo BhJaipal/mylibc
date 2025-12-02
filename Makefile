@@ -20,7 +20,7 @@ $(basename $(subst src,build,$1)).o
 endef
 
 SRCCXX := $(wildcard ./src/c++/*.cpp)
-SRCCXX_C := ./src/format.c ./src/c-impl.c ./src/env.c ./src/in.c ./src/stat.c ./src/file.c ./src/unistd.c ./src/string.c
+SRCCXX_C := ./src/format.c ./src/c-impl.c ./src/env.c ./src/in.c ./src/stat.c ./src/file.c ./src/unistd.c ./src/string.c ./src/syscall.c
 CXX_OBJ := $(foreach src, $(SRCCXX_C), $(call TO_OBJ, $(src))) $(foreach src, $(SRCCXX), $(call TO_OBJ, $(src)))
 
 TESTS := $(foreach test,$(wildcard tests/*.c), $(subst .c,,$(subst tests/,,$(test))))

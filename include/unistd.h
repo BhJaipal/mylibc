@@ -18,7 +18,5 @@ extern int lseek(uint64 fd, int64 offset, uint32 whence);
 extern int chdir(const char *path);
 extern char* getcwd(char *buf, size_t size);
 extern char* getenv(char *key);
-extern char *get_current_dir_name(void);
-
 
 #endif // !UNISTD_H

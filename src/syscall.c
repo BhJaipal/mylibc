@@ -14,13 +14,7 @@ size_t syscall(long rdi, long rsi, long rdx, long r10, long r8, long r9, long ra
 	return out;
 }
 size_t syscall_ptr(const void *rdi, const void *rsi, const void *rdx, const void *r10, const void *r8, const void *r9, long rax) {
-	asm("mov %0, %%"R10"\n"::"r"(r10));
-
-	asm("mov %0, %%"RAX"\n"::"r"(rax));
-	SYSCALL_EXEC;
-	size_t out;
-	asm("mov %%"RAX", %0\n":"=r"(out));
-	return out;
+	return syscall((size_t)rdi, (size_t)rsi, (size_t)rdx, (size_t)r10, (size_t)r8, (size_t)r9, rax);
 }
 
 void exit(int status) {

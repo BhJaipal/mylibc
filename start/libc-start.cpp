@@ -1,8 +1,8 @@
-#include <c++/heap.hpp>
+#include <heap.hpp>
+#include <system.hpp>
 
 extern int main(int argc, char **argv, char **envp);
 extern "C" void libc_main(long argc, char **argv);
-extern "C" void exit(int) __attribute__((noreturn));
 extern char** environ;
 
 extern "C" void _start() {
@@ -23,5 +23,5 @@ void libc_main(long argc, char **argv) {
 	heap.set_global();
 	int status = main(argc, argv, envp);
 	heap.destroy();
-	exit(status);
+	libc::sys::exit(status);
 }

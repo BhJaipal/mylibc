@@ -38,8 +38,4 @@ size_t syscall(long rax, long rdi, long rsi, long rdx, long r10, long r8, long r
 #define SYSCALL_EXEC asm("\nint 0x80\n");
 #endif
 
-#define MOV(dest_reg, src_val) \
-	asm("mov %0, %%" dest_reg "\n"::"r"(src_val));
-
-
 #endif // !MY_SYSCALL_H

@@ -1,5 +1,5 @@
 #ifndef STAT_H
-#include "types/struct_stat.h"
+#include "../types/struct_stat.h"
 
 /* stat() and fstatat() retrieve information about the file pointed
        to by path;*/
