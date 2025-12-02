@@ -1,6 +1,6 @@
-#include "c-impl.h"
-#include "file.h"
-#include "types.h"
+#include <c-impl.h>
+#include <io.h>
+#include <types.h>
 #include <unistd.h>
 #include <syscall.h>
 #include "string.h"
@@ -225,7 +225,10 @@ char* i64to_str(int64 x, uint8 size, char *out) {
 	}
 	out[out_len] = 0;
 
-	char *str_start = out + 1;
+	char *str_start;
+	if (is_neg)
+		str_start = out + 1;
+	else str_start = out;
 	size_t s_len = strlen(str_start);
 	
 	for (size_t i = 0; i < s_len / 2; i++) {

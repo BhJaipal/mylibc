@@ -3,6 +3,9 @@
 
 #include "types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 char toupper(char ch);
 char tolower(char ch);
 
@@ -18,5 +21,8 @@ int strcmpcase(const char *s1, const char *s2);
 int strncmpcase(const char *s1, const char *s2, size_t n);
 char *strchrnul(const char *s, int c);
 char *strdup(const char *s);
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // !MY_STRING_H

@@ -4,7 +4,7 @@
 
 int main() {
 	int server = socket(PF_INET, SOCK_STREAM, PF_UNSPEC);
-	if (server < -1) {
+	if (server == -1) {
 		printf("Can't create socket\n");
 		return 1;
 	}

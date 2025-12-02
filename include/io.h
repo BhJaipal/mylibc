@@ -36,6 +36,6 @@ void close(int fd);
 int pread(unsigned int fd, char *buf, size_t count, size_t pos);
 int pwrite(unsigned int fd, char *buf, size_t count, size_t pos);
 
-void dprintf(int fd, const char *fmt, ...);
+int dprintf(int fd, const char *fmt, ...);
 
 #endif // !IO_H

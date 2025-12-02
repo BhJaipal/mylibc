@@ -3,14 +3,10 @@ FLAGS = -nostartfiles -nostdinc -g -fPIC -Iinclude -z noexecstack -ffreestanding
 SRC := $(wildcard ./src/*.c)
 START := ./start/libc-start.c
 LIB = myc
+LIBCXX = stdc++
 CC ?= gcc
 CXX := $(wildcard ./src/c++/*.cpp)
 CXXFLAGS = -Iinclude/c++
-
-SRCCXX := $(wildcard ./src/c++/*.cpp)
-SRCCXX_C := ./src/format.c ./src/c-impl.c ./src/env.c ./src/in.c ./src/stat.c ./src/file.c ./src/unistd.c ./src/string.c ./src/io.c
-
-TESTS := $(foreach test,$(wildcard tests/*.c), $(subst .c,,$(subst tests/,,$(test))))
 
 define MAIN_FN
 $(filter-out $1,$(MAKECMDGOALS))
@@ -22,6 +18,12 @@ endef
 define TO_OBJ
 $(basename $(subst src,build,$1)).o
 endef
+
+SRCCXX := $(wildcard ./src/c++/*.cpp)
+SRCCXX_C := ./src/format.c ./src/c-impl.c ./src/env.c ./src/in.c ./src/stat.c ./src/file.c ./src/unistd.c ./src/string.c
+CXX_OBJ := $(foreach src, $(SRCCXX_C), $(call TO_OBJ, $(src))) $(foreach src, $(SRCCXX), $(call TO_OBJ, $(src)))
+
+TESTS := $(foreach test,$(wildcard tests/*.c), $(subst .c,,$(subst tests/,,$(test))))
 
 .PHONY: bin/% bin-src/%.c examples/%.c
 bin/%:
@@ -37,10 +39,10 @@ bin-src/%:
 	gcc $(FLAGS) $@ lib/lib$(LIB).so $(START) -o $(subst .c,, $(subst -src,,$@))
 
 runpp:
-	g++ $(FLAGS) $(call MAIN_FN, $@) lib/lib$(LIB).so $(CXXFLAGS) $(CXX) $(START)pp
+	g++ $(FLAGS) $(CXXFLAGS) $(call MAIN_FN, $@) lib/lib$(LIBCXX).so $(START)pp
 
 runpp-static:
-	g++ $(FLAGS) $(call MAIN_FN, $@) -static lib/lib$(LIB).a $(CXXFLAGS) $(CXX) $(START)pp
+	g++ $(FLAGS) $(CXXFLAGS) $(call MAIN_FN, $@) -static lib/lib$(LIBCXX).a $(START)pp
 
 run:
 	gcc $(FLAGS) $(call MAIN_FN, $@) lib/lib$(LIB).so $(START)
@@ -91,6 +93,8 @@ shared: $(OBJ)
 	$(CC) $(FLAGS) $(OBJ) -shared -o lib/lib$(LIB).so
 	echo -e "\e[92mBuilt done lib$(LIB).so successfully\e[0m"
 
+stdcxx: $(CXX_OBJ)
+	g++ $(FLAGS) $(CXXFLAGS) $(CXX_OBJ) -shared -o lib/lib$(LIBCXX).so
 
 ar: $(OBJ)
 	ar rcs lib/lib$(LIB).a $(OBJ)

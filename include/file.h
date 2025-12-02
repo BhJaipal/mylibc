@@ -7,8 +7,8 @@
 
 EXPORT
 File* fopen(char *path, char *modes);
-void printf(const char *fmt, ...);
-void fprintf(File *file, const char *fmt, ...);
+int printf(const char *fmt, ...);
+int fprintf(File *file, const char *fmt, ...);
 void fwrite(File *file, const char *buffer, size_t n);
 void fclose(File *file);
 EXPORT_END

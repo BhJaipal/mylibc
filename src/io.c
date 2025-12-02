@@ -1,3 +1,6 @@
+#include <format.h>
+#include <stdarg.h>
+#include <string.h>
 #include <syscall.h>
 #include <syscall_enum.h>
 #include <io.h>
@@ -27,4 +30,12 @@ int open(const char *path, FileOpenFlags flags, ...) {
 }
 void close(int fd) {
 	 SYSCALL(, SYS_close, fd);
+}
+int dprintf(int fd, const char *fmt, ...) {
+	va_list args;
+	va_start(args, fmt);
+	char *out = format_args(fmt, args);
+	va_end(args);
+	size_t out_len = strlen(out);
+	return write(fd, out, out_len);
 }
