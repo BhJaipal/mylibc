@@ -3,7 +3,7 @@
 
 extern int main(int argc, char **argv, char **envp);
 extern "C" void libc_main(long argc, char **argv);
-extern char** environ;
+extern "C" char** environ;
 
 extern "C" void _start() {
 	asm(
