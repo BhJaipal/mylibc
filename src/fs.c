@@ -2,7 +2,7 @@
 #include <syscall_enum.h>
 #include <syscall.h>
 
-size_t getdents64(int fd, linux_dirent *dirp, size_t count) {
+size_t getdents64(int fd, linux_dirent64 *dirp, size_t count) {
 	SYSCALL(return , SYS_getdents64, fd, (size_t)dirp, count);
 }
 

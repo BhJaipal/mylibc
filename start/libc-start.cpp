@@ -1,9 +1,14 @@
 #include <heap.hpp>
 #include <system.hpp>
 
+extern "C" {
+	void* heap_init();
+	void set_global_heap(void *_heap);
+	void global_heap_destroy();
+	void libc_main(long argc, char **argv);
+	char** environ;
+}
 extern int main(int argc, char **argv, char **envp);
-extern "C" void libc_main(long argc, char **argv);
-extern "C" char** environ;
 
 extern "C" void _start() {
 	asm(
@@ -19,9 +24,7 @@ extern "C" void _start() {
 void libc_main(long argc, char **argv) {
 	char **envp = argv + argc + 1;
 	environ = envp;
-	Heap heap;
-	heap.set_global();
+	set_global_heap(heap_init());
 	int status = main(argc, argv, envp);
-	heap.destroy();
 	libc::sys::exit(status);
 }

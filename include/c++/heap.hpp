@@ -25,6 +25,7 @@ namespace libc {
 				int flags, int fd, long offset);
 		int mprotect(void *__addr, size_t __len, int __prot);
 		void munmap(void *ptr, size_t size);
+		void memcpy(void* dest, void *src, libc::size_t n);
 	}
 }
 
@@ -56,25 +57,25 @@ public:
 		node_size = sizeof(Ptr);
 	}
 
+	void *malloc_generic(libc::size_t size);
+
+	void free_generic(void *ptr);
+
+	void *realloc_generic(void *ptr, libc::size_t size);
+
 	template<class T= void>
-	void free(T *ptr);
+	void free(T *ptr) {
+		free_generic((void *)ptr);
+	}
 
 	template<class T= void, class U= void>
-	T *realloc(U *ptr, libc::size_t size);
+	T *realloc(U *ptr, libc::size_t size) {
+		return (T*)realloc_generic((void *)ptr, size);
+	}
 
 	template<class T= void>
-	T* malloc(libc::size_t size);
+	T *malloc(libc::size_t size) {
+		return (T *)malloc_generic(size);
+	}
 	void destroy();
-	void set_global();
-	static void set_global(Heap* heap);
-	static void set_global(Heap& heap);
 };
-
-template<class T= void>
-void free(T *ptr);
-
-template<class T= void, class U= void>
-T *realloc(U *ptr, libc::size_t size);
-
-template<class T= void>
-T* malloc(libc::size_t size);

@@ -1,15 +1,16 @@
 #include <heap.hpp>
+#include <system.hpp>
+#include <syscall_enum.h>
 
-template<class T>
-T* Heap::malloc(libc::size_t size) {
-	void *ptr = mmap(0, size, prot, flags, fd, 0);
+void* Heap::malloc_generic(libc::size_t size) {
+	void *ptr = libc::mmap(0, size, prot, flags, fd, 0);
 	if (!head) {
 		head = (Ptr*)libc::mmap(null, node_size, libc::PROT_READ | libc::PROT_WRITE, libc::MAP_ANONYMOUS | libc::MAP_PRIVATE, -1, 0);
 		head->ptr = ptr;
 		head->size = size;
 		head->next = (Ptr*)null;
 		end = head;
-		return (T*)ptr;
+		return ptr;
 	}
 	Ptr *next = (Ptr*)libc::mmap(null, node_size, libc::PROT_READ | libc::PROT_WRITE, libc::MAP_ANONYMOUS | libc::MAP_PRIVATE, -1, 0);
 	next->ptr = ptr;
@@ -18,12 +19,10 @@ T* Heap::malloc(libc::size_t size) {
 
 	end->next = next;
 	end = next;
-	return (T*)ptr;
+	return ptr;
 }
 
-
-template<class T>
-void Heap::free(T *ptr) {
+void Heap::free_generic(void *ptr) {
 	Ptr *head = this->head;
 	if (!head) return;
 	Ptr *prev = (Ptr*)null;
@@ -43,8 +42,7 @@ void Heap::free(T *ptr) {
 	}
 }
 
-template<class T, class U>
-T *Heap::realloc(U *ptr, libc::size_t size) {
+void *Heap::realloc_generic(void *ptr, libc::size_t size) {
 	void *new_ptr = mmap(0, size, prot,
 				  flags, fd, 0);
 
@@ -60,20 +58,9 @@ T *Heap::realloc(U *ptr, libc::size_t size) {
 			break;
 		}
 	}
-	memcpy(new_ptr, ptr, len);
-	munmap(ptr, len);
-	return (T*)new_ptr;
-}
-
-Heap *heap;
-void Heap::set_global() {
-	heap = this;
-}
-void Heap::set_global(Heap* heap_) {
-	heap = heap_;
-}
-void Heap::set_global(Heap& heap_) {
-	heap = &heap_;
+	libc::memcpy(new_ptr, ptr, len);
+	libc::munmap(ptr, len);
+	return new_ptr;
 }
 void Heap::destroy() {
 	Heap *heap = this;
@@ -86,19 +73,4 @@ void Heap::destroy() {
 		libc::munmap(prev->ptr, prev->size);
 		libc::munmap(prev, heap->node_size);
 	}
-}
-
-template<class T>
-void free(T *ptr) {
-	heap->free<T>(ptr);
-}
-
-template<class T, class U>
-T *realloc(U *ptr, libc::size_t size) {
-	return heap->realloc<T, U>(ptr, size);
-}
-
-template<class T>
-T* malloc(libc::size_t size) {
-	return heap->malloc<T>(size);
 }

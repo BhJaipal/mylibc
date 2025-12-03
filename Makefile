@@ -1,12 +1,16 @@
 SHELL = /bin/bash
-FLAGS = -nostartfiles -nostdinc -g -fPIC -Iinclude -z noexecstack -ffreestanding -Wno-implicit-function-declaration
+FLAGS = -nostartfiles -nostdinc -g -fPIC -Iinclude -z noexecstack -ffreestanding
+CFLAGS = -Wno-implicit-function-declaration
+
 SRC := $(wildcard ./src/*.c)
+SRCCXX := $(wildcard ./src/c++/*.cpp)
+
 START := ./start/libc-start.c
-LIB = myc
+LIBC = myc
 LIBCXX = stdc++
 CC ?= gcc
 CXX := $(wildcard ./src/c++/*.cpp)
-CXXFLAGS = -Iinclude/c++
+CXXFLAGS = -Iinclude/c++ -nolibc -nostdinc++ -nostdlib++
 
 define MAIN_FN
 $(filter-out $1,$(MAKECMDGOALS))
@@ -19,15 +23,15 @@ define TO_OBJ
 $(basename $(subst src,build,$1)).o
 endef
 
-SRCCXX := $(wildcard ./src/c++/*.cpp)
-SRCCXX_C := ./src/format.c ./src/c-impl.c ./src/env.c ./src/in.c ./src/stat.c ./src/file.c ./src/unistd.c ./src/string.c ./src/syscall.c
-CXX_OBJ := $(foreach src, $(SRCCXX_C), $(call TO_OBJ, $(src))) $(foreach src, $(SRCCXX), $(call TO_OBJ, $(src)))
+
+C_OBJ := $(foreach src, $(SRC), $(call TO_OBJ, $(src)))
+CXX_OBJ := $(foreach src, $(SRC), $(call TO_OBJ, $(src))) $(foreach src, $(SRCCXX), $(call TO_OBJ, $(src)))
 
 TESTS := $(foreach test,$(wildcard tests/*.c), $(subst .c,,$(subst tests/,,$(test))))
 
 .PHONY: bin/% bin-src/%.c examples/%.c
 bin/%:
-	gcc $(FLAGS) $(subst bin,bin-src,$@).c lib/lib$(LIB).so $(START) -o $@
+	gcc $(FLAGS) $(CFLAGS) $(subst bin,bin-src,$@).c lib/lib$(LIBC).so $(START) -o $@
 
 .ONESHELL:
 bins:
@@ -36,7 +40,7 @@ bins:
 	done
 
 bin-src/%:
-	gcc $(FLAGS) $@ lib/lib$(LIB).so $(START) -o $(subst .c,, $(subst -src,,$@))
+	gcc $(FLAGS) $(CFLAGS) $@ lib/lib$(LIBC).so $(START) -o $(subst .c,, $(subst -src,,$@))
 
 runpp:
 	g++ $(FLAGS) $(CXXFLAGS) $(call MAIN_FN, $@) lib/lib$(LIBCXX).so $(START)pp
@@ -45,16 +49,16 @@ runpp-static:
 	g++ $(FLAGS) $(CXXFLAGS) $(call MAIN_FN, $@) -static lib/lib$(LIBCXX).a $(START)pp
 
 run:
-	gcc $(FLAGS) $(call MAIN_FN, $@) lib/lib$(LIB).so $(START)
+	gcc $(FLAGS) $(CFLAGS) $(call MAIN_FN, $@) lib/lib$(LIBC).so $(START)
 
 run-static:
-	gcc $(FLAGS) $(call MAIN_FN, $@) -static lib/lib$(LIB).a $(START)
+	gcc $(FLAGS) $(CFLAGS) $(call MAIN_FN, $@) -static lib/lib$(LIBC).a $(START)
 
 examples/%.c:
-	$(CC) $(FLAGS) $@ lib/lib$(LIB).so $(START)
+	$(CC) $(FLAGS) $(CFLAGS) $@ lib/lib$(LIBC).so $(START)
 
 build/%.o: src/%.c
-	$(CC) $(FLAGS) -o $@ -c $(call TO_SRC, $@)
+	$(CC) $(FLAGS) $(CFLAGS) -o $@ -c $(call TO_SRC, $@)
 
 build/c++/%.o: src/c++/%.cpp
 	g++ $(FLAGS) $(CXXFLAGS) $(subst build,src,$(basename $@)).cpp -c -o $@
@@ -62,13 +66,11 @@ build/c++/%.o: src/c++/%.cpp
 buildcxx:
 	$(foreach src, $(SRCCXX), make $(subst src,build,$(basename $(src))).o;)
 
-OBJ := $(foreach src, $(SRC), $(call TO_OBJ, $(src)))
-
 .ONESHELL:
 test-all:
 	failed=;
 	for item in $(TESTS); do
-		gcc $(FLAGS) test.c tests/$$item.c lib/lib$(LIB).so $(START) -o $$item-test.exe;
+		gcc $(FLAGS) $(CFLAGS) test.c tests/$$item.c lib/lib$(LIBC).so $(START) -o $$item-test.exe;
 		if [[ $$? == 1 ]]; then failed=1; fi;
 	done;
 	for item in $(TESTS); do
@@ -81,24 +83,24 @@ test-all:
 
 .ONESHELL:
 test:
-	gcc $(FLAGS) test.c tests/$(TEST).c lib/lib$(LIB).so $(START) -o $(TEST)-test.exe
+	gcc $(FLAGS) $(CFLAGS) test.c tests/$(TEST).c lib/lib$(LIBC).so $(START) -o $(TEST)-test.exe
 	./$(TEST)-test.exe
 
 .ONESHELL:
 compile:
-	$(foreach s, $(OBJ), make $(s);)
+	$(foreach s, $(C_OBJ), make $(s);)
 	echo -e "\e[92mCompiled all done source files\e[0m"
 
-shared: $(OBJ)
-	$(CC) $(FLAGS) $(OBJ) -shared -o lib/lib$(LIB).so
-	echo -e "\e[92mBuilt done lib$(LIB).so successfully\e[0m"
+shared: $(C_OBJ)
+	$(CC) $(FLAGS) $(CFLAGS) $(C_OBJ) -shared -o lib/lib$(LIBC).so
+	echo -e "\e[92mBuilt done lib$(LIBC).so successfully\e[0m"
 
-stdcxx: $(CXX_OBJ)
-	g++ $(FLAGS) $(CXXFLAGS) $(CXX_OBJ) -shared -o lib/lib$(LIBCXX).so
+stdcxx: $(CXX_OBJ) shared
+	g++ $(FLAGS) $(CXXFLAGS) $(CXX_OBJ) lib/lib$(LIBC).so -shared -o lib/lib$(LIBCXX).so
 
-ar: $(OBJ)
-	ar rcs lib/lib$(LIB).a $(OBJ)
-	echo -e "\e[92mBuilt done lib$(LIB).a successfully\e[0m"
+ar: $(C_OBJ)
+	ar rcs lib/lib$(LIBC).a $(C_OBJ)
+	echo -e "\e[92mBuilt done lib$(LIBC).a successfully\e[0m"
 
 clean:
 	rm a.out
@@ -106,3 +108,4 @@ clean:
 
 clean-build:
 	rm build/*.o
+	rm build/c++/*.o

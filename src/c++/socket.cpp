@@ -8,8 +8,7 @@ extern "C" {
 #include <net/sock.h>
 #include <syscall_enum.h>
 
-namespace std {
-	namespace net {
+namespace std::net {
 	int Socket::bind(libc::uint16 port) {
 		libc::net::SocketAddrIn addr;
 		addr.sin_family = PF_INET;
@@ -21,7 +20,7 @@ namespace std {
 	Socket::Socket(ProtocolFamily domain, SocketType type, ProtocolFamily protocol) {
 		fd = sys::syscall(SYS_socket, domain, type, protocol);
 		if (fd == -1) {
-			stdout().write("Failed to connect socket\n");
+			io::stdout().write("Failed to connect socket\n");
 			sys::syscall(SYS_exit, 1);
 		}
 	}
@@ -33,6 +32,5 @@ namespace std {
 		socklen_t client_len = sizeof(client_Addr);
 		int client = sys::syscall(SYS_accept, fd, (libc::size_t)&client_Addr, (libc::size_t)&client_len);
 		return Socket(client);
-	}
 	}
 }

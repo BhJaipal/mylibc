@@ -8,7 +8,9 @@
 
 ```sh
 make compile # create build/*.o of src
-make shared  # creates ./mylibc.so
+make shared  # creates lib/libmyc.so
+# For C++
+make stdcxx  # creates lib/libstdc++.so
 ```
 
 ## Run tests
@@ -25,5 +27,8 @@ make test TEST=(test-name)
 ## Compiling your files
 
 ```sh
-make all your-file.c
+# For C
+make run your-file.c # run-static for static output
+# For C++
+make runpp your-file.c # runpp-static for static output
 ```
