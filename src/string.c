@@ -102,6 +102,33 @@ int strncmpcase(const char *s1, const char *s2, size_t n) {
 	return -1;
 }
 
+int strninclude(const char *target, const char *cmp, size_t n) {
+	if (cmp[0] == 0) return -1;
+	size_t loc = 0, len = strlen(target), i = 0;
+	while (loc != n && loc != len) {
+		i = 0;
+		while (target[loc + i] == cmp[i] || cmp[i] == 0) {
+			if (cmp[i] == 0) return 0;
+			i++;
+		}
+		loc++;
+	}
+	return -1;
+}
+int strinclude(const char *target, const char *cmp) {
+	if (cmp[0] == 0) return -1;
+	size_t loc = 0, len = strlen(target), i = 0;
+	while (loc != len) {
+		i = 0;
+		while (target[loc + i] == cmp[i] || cmp[i] == 0) {
+			if (cmp[i] == 0) return 0;
+			i++;
+		}
+		loc++;
+	}
+	return -1;
+}
+
 #define ALIGN (sizeof(size_t))
 #define ONES ((size_t)-1/UCHAR_MAX)
 #define HIGHS (ONES * (UCHAR_MAX/2+1))

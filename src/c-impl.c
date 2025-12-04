@@ -238,7 +238,28 @@ char* i64to_str(int64 x, uint8 size, char *out) {
 	}
 	return out;
 }
-
+int isspace(int a) {
+	char spaces[] = "\v\t\f\n\r ";
+	for (int i = 0; i < 6; i++) {
+		if (spaces[i] == a) return 1;
+	}
+	return 0;
+}
+int isdigit(int a) {
+	return 0x30 <= a && a <= 0x39;
+}
+int atoi(const char *s) {
+	int n=0, neg=0;
+	while (isspace(*s)) s++;
+	switch (*s) {
+		case '-': neg=1;
+		case '+': s++;
+	}
+	/* Compute n as a negative number to avoid overflow on INT_MIN */
+	while (isdigit(*s))
+		n = 10*n - (*s++ - '0');
+	return neg ? n : -n;
+}
 int read_int() {
 	int x = 0;
 	char num[11];

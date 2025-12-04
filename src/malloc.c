@@ -1,7 +1,7 @@
-#include "malloc.h"
-#include "syscall.h"
-#include "syscall_enum.h"
-#include "types.h"
+#include <malloc.h>
+#include <syscall.h>
+#include <syscall_enum.h>
+#include <types.h>
 #define ST (size_t)
 
 void *mmap (void *addr, size_t len, PageProtection prot,
@@ -96,6 +96,11 @@ void heap_delete_node(Heap *heap, void *val) {
 		heap->head = null;
 	}
 }
+void memset(void *dest, uint8 byte, size_t n) {
+	for (size_t i = 0; i < n; i++) {
+		((uint8*)dest)[i] = byte;
+	}
+}
 
 static Heap* access_global_heap(char is_write, Heap *new_heap) {
 	static Heap *heap = null;
@@ -122,9 +127,9 @@ void heap_update(Heap *heap, HeapEvent event, void *ptr, size_t len) {
 	}
 }
 
-void* memcpy(uint8 *dest, const uint8 *src, size_t n) {
+void* memcpy(void *dest, const void *src, size_t n) {
 	for (size_t i = 0; i < n; i++) {
-		dest[i] = src[i];
+		((uint8*)dest)[i] = ((uint8*)src)[i];
 	}
 	return dest;
 }

@@ -5,6 +5,12 @@
 #include "syscall.h"
 
 EXPORT
+
+
+int isspace(int a);
+int isdigit(int a);
+int atoi(const char *s);
+
 int rev_d(int x);
 char* i64to_str(int64 x, uint8 size, char *out);
 uint32 rev_u(uint32 x);

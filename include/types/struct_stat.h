@@ -3,17 +3,17 @@
 #include "../types.h"
 
 typedef struct {
-	uint32 st_dev;		/* Device */
+	uint64 st_dev;		/* Device */
 	uint64 st_ino;		/* File serial number */
 
     uint64 st_nlink;	/* Link count.  */
-    uint64 st_mode; 	/* File mode.  */
+    uint32 st_mode; 	/* File mode.  */
 
     uint32 st_uid;		/* User ID of the file's owner.	*/
     uint32 st_gid;		/* Group ID of the file's group.*/
 	int __pad0;
 
-    uint32 st_rdev; 	/* Device number, if device.  */
+    uint64 st_rdev; 	/* Device number, if device.  */
     int64 st_size;			/* Size of file, in bytes.  */
 
     int64 st_blksize;	/* Optimal block size for I/O.  */
@@ -23,7 +23,7 @@ typedef struct {
     struct timespec st_mtim;			/* Time of last modification.  */
     struct timespec st_ctim;			/* Time of last status change.  */
 
-	int __glibc_reserved[3];
+	long __glibc_reserved[3];
 } Stat;
 
 struct statx_timestamp {

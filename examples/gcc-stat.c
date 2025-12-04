@@ -1,6 +1,7 @@
-#include <c-impl.h>
+#include <stdio.h>
 #include <sys/stat.h>
-#include <io.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 int main(int argc, char **argv) {
 	int fd;
@@ -8,14 +9,10 @@ int main(int argc, char **argv) {
 		fd = open(argv[1], O_RDWR);
 	else
 		fd = open(argv[0], O_RDWR);
-	write_int(fd);
-	println(" ");
+	printf("%d ", fd);
 
-	Stat statb;
+	struct stat statb;
 	fstat(fd, &statb);
-	write_uint(statb.st_dev);
-	print(" ");
-	write_uint(statb.st_size);
-	println(" ");
+	printf("%lu %ld\n", statb.st_dev, statb.st_size);
 	close(fd);
 }
